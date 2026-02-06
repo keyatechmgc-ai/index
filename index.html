@@ -3,104 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دعوة زفاف ملكية | سيادة النقيب</title>
+    <title>M & E | Wedding Celebration</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Dancing+Script:wght@700&family=Lateef&display=swap" rel="stylesheet">
     
     <style>
-        /* تصميم كلاسيكي فاخر */
-        :root { --gold: #D4AF37; --royal-red: #600000; --bg: #fdfbfb; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: #333; overflow-x: hidden; }
+        :root { --primary: #ff85a2; --secondary: #fbb1bd; --accent: #c5a059; --text: #590d22; }
+        body { font-family: 'Cairo', sans-serif; background: #fff0f3; margin: 0; color: var(--text); overflow-x: hidden; }
         
-        /* الهيدر الملكي */
-        .royal-header { 
-            background: linear-gradient(rgba(96, 0, 0, 0.9), rgba(96, 0, 0, 0.9)), url('https://www.transparenttextures.com/patterns/gold-floral.png');
-            padding: 60px 20px; text-align: center; color: var(--gold); border-bottom: 8px double var(--gold); 
-        }
-        .royal-header h1 { font-family: 'Amiri', serif; font-size: 3.5rem; margin: 0; letter-spacing: 2px; }
+        /* انيميشن خلفية متحركة */
+        .bg-animate { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: linear-gradient(45deg, #fff0f3, #fbb1bd); opacity: 0.5; }
+
+        /* الهيدر الرومانسي */
+        .header { text-align: center; padding: 60px 20px; background: white; border-bottom-left-radius: 50% 20%; border-bottom-right-radius: 50% 20%; box-shadow: 0 10px 30px rgba(255,133,162,0.2); position: relative; }
+        .couple-img { width: 280px; height: 280px; border-radius: 50%; border: 8px solid white; box-shadow: 0 0 25px rgba(0,0,0,0.1); object-fit: cover; margin-bottom: 20px; transition: 0.5s; animation: pulse 3s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
         
-        /* العداد الفخم */
-        .countdown-container { display: flex; justify-content: center; gap: 15px; margin-top: -40px; }
-        .counter-card { 
-            background: white; width: 85px; padding: 15px 5px; border-radius: 10px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 2px solid var(--gold);
-        }
-        .counter-card span { display: block; font-size: 28px; font-weight: bold; color: var(--royal-red); }
-        .counter-card label { font-size: 14px; color: var(--gold); font-weight: bold; }
+        h1 { font-family: 'Dancing Script', cursive; font-size: 4rem; color: var(--primary); margin: 10px 0; }
+        
+        /* العداد */
+        .timer { display: flex; justify-content: center; gap: 15px; margin-top: -40px; }
+        .unit { background: white; padding: 15px; border-radius: 20px; min-width: 70px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 2px solid var(--secondary); transform: rotate(-2deg); }
+        .unit:nth-child(even) { transform: rotate(2deg); }
+        .unit span { display: block; font-size: 26px; font-weight: bold; color: var(--primary); }
 
-        /* الأقسام */
-        .section-card { 
-            max-width: 600px; margin: 50px auto; background: white; padding: 30px; 
-            border-radius: 2px; border: 1px solid #eee; position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.05);
-        }
-        .section-card::before { content: ""; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid var(--gold); pointer-events: none; }
+        /* الكروت */
+        .card { max-width: 600px; margin: 50px auto; background: rgba(255,255,255,0.9); padding: 30px; border-radius: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+        
+        .input-group { margin-bottom: 20px; }
+        input, textarea, select { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid var(--secondary); background: white; font-family: 'Cairo'; box-sizing: border-box; }
+        
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .choice { padding: 12px; border: 2px solid var(--secondary); border-radius: 15px; cursor: pointer; text-align: center; transition: 0.3s; font-weight: bold; }
+        .choice.selected { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* أزرار الحضور */
-        .rsvp-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 25px 0; }
-        .rsvp-option { 
-            padding: 15px; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; 
-            font-weight: bold; background: #fff; color: var(--royal-red);
-        }
-        .rsvp-option:hover, .rsvp-option.active { background: var(--royal-red); color: white; border-color: var(--royal-red); }
-
-        /* أنيميشن الورد */
-        .flower { position: fixed; top: -10%; font-size: 20px; z-index: 1000; pointer-events: none; animation: fall 5s linear infinite; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
-
-        /* المدخلات */
-        input, textarea { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ccc; box-sizing: border-box; font-family: 'Cairo'; }
-        .btn-gold { background: var(--gold); color: white; border: none; padding: 18px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
+        /* تعليقات الضيوف */
+        .comment { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; position: relative; border-left: 6px solid var(--primary); transition: 0.3s; }
+        .comment:hover { transform: translateX(-5px); }
+        .comment-info { font-size: 12px; color: #888; display: flex; justify-content: space-between; margin-top: 10px; }
+        .badge { background: var(--secondary); color: var(--text); padding: 3px 10px; border-radius: 10px; font-size: 11px; }
 
         /* لوحة التحكم */
-        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; padding: 40px; overflow-y: auto; box-sizing: border-box; }
-        .couple-img { width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--gold); margin: 20px auto; display: none; object-fit: cover; }
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 10000; padding: 30px; overflow-y: auto; box-sizing: border-box; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: var(--secondary); padding: 15px; border-radius: 15px; text-align: center; }
+        .stat-box h4 { margin: 0; font-size: 14px; }
+        .stat-box p { font-size: 24px; font-weight: bold; margin: 5px 0; }
+
+        /* انيميشن العناصر الطائرة */
+        .heart { position: fixed; font-size: 20px; color: var(--primary); z-index: 1000; pointer-events: none; animation: fly 6s linear infinite; }
+        @keyframes fly { 0% { transform: translateY(100vh) scale(0); opacity: 1; } 100% { transform: translateY(-10vh) scale(1.5); opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div class="royal-header">
-    <img id="mainImage" src="" class="couple-img">
+<div class="bg-animate"></div>
+
+<div class="header">
+    <img id="mainImg" src="" class="couple-img" style="display:none;">
     <h1>M & E</h1>
-    <p style="font-size: 1.4rem;">فرحة العمر تكتمل بتشريفكم</p>
+    <p style="font-size: 1.3rem; font-family: 'Lateef';">لحظاتنا السعيدة تبدأ بوجودكم</p>
 </div>
 
-<div class="countdown-container">
-    <div class="counter-card"><span id="days">00</span><label>يوم</label></div>
-    <div class="counter-card"><span id="hours">00</span><label>ساعة</label></div>
-    <div class="counter-card"><span id="minutes">00</span><label>دقيقة</label></div>
-    <div class="counter-card" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span><label>ثانية</label></div>
+<div class="timer">
+    <div class="unit"><span id="days">00</span>يوم</div>
+    <div class="unit"><span id="hours">00</span>ساعة</div>
+    <div class="unit"><span id="minutes">00</span>دقيقة</div>
+    <div class="unit" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span>ثانية</div>
 </div>
 
-<div class="section-card">
-    <h2 style="text-align: center; color: var(--royal-red); font-family: 'Amiri';">تأكيد تشريف سيادتكم</h2>
-    <input type="text" id="userName" placeholder="الاسم الكريم لسيادتكم">
+<div class="card">
+    <h3 style="text-align: center;">شاركونا فرحتنا ❤️</h3>
     
-    <div class="rsvp-grid">
-        <div class="rsvp-option" onclick="selectRSVP(this, 'بإذن الله سأكون من الحاضرين')">بإذن الله سأكون من الحاضرين</div>
-        <div class="rsvp-option" onclick="selectRSVP(this, 'سأبذل جهدي للتشريف')">سأبذل جهدي للتشريف</div>
-        <div class="rsvp-option" onclick="selectRSVP(this, 'أعتذر لظروف قهرية')">أعتذر لظروف قهرية</div>
+    <div class="input-group">
+        <input type="text" id="guestName" placeholder="الاسم الكريم">
     </div>
-    
-    <textarea id="userMsg" rows="3" placeholder="كلمة تهنئة للعروسين..."></textarea>
-    <button class="btn-gold" onclick="sendInvite()">إرسال التهنة وتأكيد الحضور</button>
-    
-    <div id="commentsList" style="margin-top: 40px;"></div>
+
+    <p style="font-weight: bold; font-size: 14px;">أنت من ضيوف:</p>
+    <div class="option-grid">
+        <div class="choice" onclick="setSide(this, 'العريس')">🤵 العريس</div>
+        <div class="choice" onclick="setSide(this, 'العروسة')">👰 العروسة</div>
+    </div>
+
+    <p style="font-weight: bold; font-size: 14px;">هل ستشرفنا بالحضور؟</p>
+    <select id="attendance">
+        <option value="">اختر حالتك...</option>
+        <option value="حاضر">بإذن الله سأكون من الحاضرين</option>
+        <option value="يحاول">سأبذل قصارى جهدي للتشريف</option>
+        <option value="معتذر">أعتذر لظروف قهرية</option>
+    </select>
+
+    <div class="input-group" style="margin-top: 15px;">
+        <textarea id="guestMsg" rows="3" placeholder="تهنئة من القلب..."></textarea>
+    </div>
+
+    <button onclick="submitInvite()" style="background: var(--primary); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 15px rgba(255,133,162,0.4);">إرسال التهنة وتأكيد الحضور</button>
+
+    <div id="guestBook" style="margin-top: 40px;"></div>
 </div>
 
 <div id="admin-panel">
-    <h2 style="color: var(--royal-red)">لوحة التحكم يا سيادة النقيب</h2>
-    <input type="datetime-local" id="targetDate">
-    <input type="text" id="imgUrl" placeholder="رابط صورة العروسين">
-    <button onclick="updateSettings()" style="background: green; color:white; padding: 15px;">حفظ الإعدادات</button>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; padding:15px;">إغلاق</button>
+    <h2 style="color: var(--primary);">📊 إحصائيات الحفل الملكي</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-box" style="grid-column: span 2; background: var(--primary); color: white;"><h4>العدد الكلي للردود</h4><p id="totalRes">0</p></div>
+        <div class="stat-box"><h4>ضيوف العريس</h4><p id="groomGuests">0</p></div>
+        <div class="stat-box"><h4>ضيوف العروسة</h4><p id="brideGuests">0</p></div>
+        <div class="stat-box" style="background: #d4edda;"><h4>تأكيد حضور</h4><p id="absYes">0</p></div>
+        <div class="stat-box" style="background: #fff3cd;"><h4>سيحاولون</h4><p id="absMaybe">0</p></div>
+        <div class="stat-box" style="background: #f8d7da;"><h4>معتذرين</h4><p id="absNo">0</p></div>
+    </div>
+
     <hr>
-    <div id="adminComments"></div>
+    <h4>الإعدادات</h4>
+    <input type="datetime-local" id="newDate">
+    <input type="text" id="newImg" placeholder="رابط صورة العروسين">
+    <button onclick="saveSettings()" style="background: var(--primary); color: white; border: none; padding: 10px; width: 100%; margin-top: 10px;">حفظ الإعدادات</button>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background: #666; color: white; border: none; padding: 10px; width: 100%; margin-top: 5px;">إغلاق</button>
+    
+    <div id="adminList" style="margin-top: 20px;"></div>
 </div>
 
 <script>
-    // بياناتك
     const firebaseConfig = {
         apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
         authDomain: "engagmen.firebaseapp.com",
@@ -114,74 +139,99 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    let tTime = 0;
-    let rsvpStatus = "";
+    let guestSide = "";
+    let targetTime = 0;
 
-    function selectRSVP(el, val) {
-        document.querySelectorAll('.rsvp-option').forEach(opt => opt.classList.remove('active'));
-        el.classList.add('active');
-        rsvpStatus = val;
+    function setSide(el, side) {
+        document.querySelectorAll('.choice').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        guestSide = side;
     }
 
-    // جلب البيانات فوراً
     db.ref('settings').on('value', s => {
         const v = s.val();
         if(v) {
-            if(v.date) { tTime = new Date(v.date).getTime(); document.getElementById('targetDate').value = v.date; }
-            if(v.image) { document.getElementById('mainImage').src = v.image; document.getElementById('mainImage').style.display='block'; }
+            if(v.date) { targetTime = new Date(v.date).getTime(); document.getElementById('newDate').value = v.date; }
+            if(v.image) { document.getElementById('mainImg').src = v.image; document.getElementById('mainImg').style.display = 'inline-block'; }
+            else { document.getElementById('mainImg').style.display = 'none'; }
         }
     });
 
-    // العداد التلقائي
     setInterval(() => {
-        const diff = tTime - Date.now();
+        const diff = targetTime - Date.now();
         if(diff <= 0) return;
-        document.getElementById('days').innerText = String(Math.floor(diff/(1000*60*60*24))).padStart(2, '0');
-        document.getElementById('hours').innerText = String(Math.floor((diff%(1000*60*60*24))/(1000*60*60))).padStart(2, '0');
-        document.getElementById('minutes').innerText = String(Math.floor((diff%(1000*60*60))/(1000*60))).padStart(2, '0');
-        document.getElementById('seconds').innerText = String(Math.floor((diff%(1000*60))/1000)).padStart(2, '0');
+        document.getElementById('days').innerText = Math.floor(diff/(1000*60*60*24));
+        document.getElementById('hours').innerText = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        document.getElementById('minutes').innerText = Math.floor((diff%(1000*60*60))/(1000*60));
+        document.getElementById('seconds').innerText = Math.floor((diff%(1000*60))/1000);
     }, 1000);
 
-    function sendInvite() {
-        const n = document.getElementById('userName').value;
-        const m = document.getElementById('userMsg').value;
-        if(n && rsvpStatus) {
-            db.ref('comments').push({ name: n, msg: m, status: rsvpStatus });
-            alert("تم إرسال تهنئتكم بنجاح!");
-            document.getElementById('userName').value = ""; document.getElementById('userMsg').value = "";
-        } else { alert("يرجى كتابة الاسم واختيار حالة الحضور"); }
+    function submitInvite() {
+        const name = document.getElementById('guestName').value;
+        const msg = document.getElementById('guestMsg').value;
+        const att = document.getElementById('attendance').value;
+        const now = new Date();
+        const timeStr = now.toLocaleDateString('ar-EG') + " | " + now.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'});
+
+        if(name && guestSide && att) {
+            db.ref('comments').push({
+                name: name, msg: msg, side: guestSide, status: att, time: timeStr
+            }).then(() => {
+                alert("تم إرسال تهنئتك لسيادة النقيب بنجاح ❤️");
+                document.getElementById('guestName').value = "";
+                document.getElementById('guestMsg').value = "";
+            });
+        } else { alert("يرجى إكمال البيانات (الاسم، الجانب، حالة الحضور)"); }
     }
 
     db.ref('comments').on('value', s => {
-        const list = document.getElementById('commentsList');
-        const adm = document.getElementById('adminComments');
-        list.innerHTML = ''; adm.innerHTML = '<h3>قائمة الحضور:</h3>';
+        const list = document.getElementById('guestBook');
+        const adm = document.getElementById('adminList');
+        list.innerHTML = ""; adm.innerHTML = "<h4>كشف الضيوف:</h4>";
+        
+        let stats = { total: 0, groom: 0, bride: 0, yes: 0, maybe: 0, no: 0 };
+
         s.forEach(c => {
             const d = c.val();
-            list.innerHTML += `<div style="border-bottom:1px solid #eee; padding:15px 0;">
-                <b style="color:var(--royal-red)">${d.name}</b>: ${d.msg} <br> <small style="color:var(--gold)">${d.status}</small></div>`;
-            adm.innerHTML += `<div style="padding:10px; border-bottom:1px solid #ddd;">
-                <button onclick="db.ref('comments/${c.key}').remove()" style="background:red; color:white;">حذف</button> ${d.name}</div>`;
+            stats.total++;
+            if(d.side === 'العريس') stats.groom++; else stats.bride++;
+            if(d.status === 'حاضر') stats.yes++; else if(d.status === 'معتذر') stats.no++; else stats.maybe++;
+
+            list.innerHTML += `<div class="comment">
+                <b>${d.name}</b> <span class="badge">${d.side}</span> <br> ${d.msg}
+                <div class="comment-info"><span>الحالة: ${d.status}</span> <span>${d.time}</span></div>
+            </div>`;
+
+            adm.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee;">
+                <button onclick="db.ref('comments/${c.key}').remove()" style="background:red; color:white; border:none; border-radius:5px;">حذف</button>
+                ${d.name} (${d.side}) - ${d.status}
+            </div>`;
         });
+
+        document.getElementById('totalRes').innerText = stats.total;
+        document.getElementById('groomGuests').innerText = stats.groom;
+        document.getElementById('brideGuests').innerText = stats.bride;
+        document.getElementById('absYes').innerText = stats.yes;
+        document.getElementById('absMaybe').innerText = stats.maybe;
+        document.getElementById('absNo').innerText = stats.no;
     });
 
     let clicks = 0;
     function adminAuth() { clicks++; if(clicks>=10) { document.getElementById('admin-panel').style.display='block'; clicks=0; } }
 
-    function updateSettings() {
-        const d = document.getElementById('targetDate').value;
-        const i = document.getElementById('imgUrl').value;
-        db.ref('settings').update({ date: d, image: i }).then(() => alert("تم تحديث البيانات"));
+    function saveSettings() {
+        const d = document.getElementById('newDate').value;
+        const i = document.getElementById('newImg').value;
+        db.ref('settings').update({ date: d, image: i }).then(() => alert("تم تحديث البيانات بنجاح"));
     }
 
-    // تساقط الورد
     setInterval(() => {
-        const f = document.createElement('div');
-        f.className = 'flower'; f.innerHTML = '🌸';
-        f.style.left = Math.random() * 100 + 'vw';
-        f.style.animationDuration = (Math.random() * 2 + 3) + 's';
-        document.body.appendChild(f);
-        setTimeout(() => f.remove(), 5000);
+        const heart = document.createElement('div');
+        heart.className = 'heart'; heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 6000);
     }, 800);
 </script>
 </body>
