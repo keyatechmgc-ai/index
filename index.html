@@ -3,105 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حفل خطوبة | M & E</title>
+    <title>Wedding Invitation | Speed Pro</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --pink: #ff85a2; --gold: #c5a059; --dark: #4a0e0e; }
-        body { font-family: 'Cairo', sans-serif; background: #fff5f7; margin: 0; color: var(--dark); text-align: center; }
-        
-        /* تساقط الورد والقلوب */
-        .rose { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
-
-        /* الهيدر والأسماء بالخط الجديد الواضح */
+        :root { --pink: #ff85a2; --gold: #c5a059; }
+        body { font-family: 'Cairo', sans-serif; background: #fff5f7; margin: 0; text-align: center; }
         .header { background: white; padding: 40px 10px; border-bottom: 4px solid var(--gold); border-radius: 0 0 40px 40px; }
         .main-names { font-family: 'Cinzel', serif; font-size: 3.2rem; color: var(--pink); margin: 0; letter-spacing: 5px; }
         .couple-img { width: 220px; height: 220px; border-radius: 50%; border: 5px solid var(--gold); object-fit: cover; margin: 15px auto; display: none; }
-
-        /* تفاصيل القاعة والعداد */
-        .event-info { background: #fff; margin: 20px auto; width: 85%; padding: 15px; border-radius: 20px; border: 1px dashed var(--gold); }
-        .timer { display: flex; justify-content: center; gap: 8px; margin-top: -25px; }
-        .unit { background: white; padding: 10px; border-radius: 12px; min-width: 55px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--pink); }
-        .unit span { display: block; font-size: 20px; font-weight: bold; color: var(--pink); }
-
-        /* الكروت والمدخلات */
         .card { width: 90%; max-width: 450px; margin: 30px auto; background: white; padding: 20px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; font-family: 'Cairo'; box-sizing: border-box; }
-        
-        .side-btn { flex: 1; padding: 10px; border: 2px solid var(--pink); border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .side-btn.active { background: var(--pink); color: white; }
-
-        /* التعليقات */
-        .comment-item { text-align: right; background: #fff9fa; padding: 12px; border-radius: 15px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 12px; }
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--pink); }
-
-        /* لوحة التحكم */
-        #admin-panel { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; padding:20px; overflow-y:auto; box-sizing: border-box; }
-        .loading-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:10000; align-items:center; justify-content:center; flex-direction:column; }
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        .loading-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:10000; align-items:center; justify-content:center; flex-direction:column; }
+        .rose { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
     </style>
 </head>
 <body>
 
-<div id="loader" class="loading-overlay"><h3>جاري الحفظ يا سيادة النقيب...</h3></div>
+<div id="loader" class="loading-overlay">
+    <h3 id="loadText">جاري المعالجة والرفع السريع...</h3>
+</div>
 
 <div class="header">
     <h1 class="main-names">M & E</h1>
     <img id="displayImg" class="couple-img">
-    <div class="event-info">
-        <b id="hallName">قاعة الفرح</b> <br>
-        📅 <span id="eventDay">اليوم</span> | 🕒 <span id="eventTime">الساعة</span> <br>
-        <div id="eventNotes" style="font-size: 12px; margin: 5px 0;"></div>
-        <a id="locLink" href="#" target="_blank" style="color:#4285F4; text-decoration:none; font-weight:bold;">📍 موقع القاعة على الخريطة</a>
+    <div id="infoBox" style="margin-top:15px; font-weight:bold;">
+        <span id="hallName"></span> | <span id="eventDay"></span> <br>
+        <a id="locLink" href="#" target="_blank" style="color:#4285F4; font-size:14px;">📍 موقع القاعة</a>
     </div>
-</div>
-
-<div class="timer">
-    <div class="unit"><span id="days">00</span>يوم</div>
-    <div class="unit"><span id="hours">00</span>ساعة</div>
-    <div class="unit"><span id="minutes">00</span>دقيقة</div>
-    <div class="unit" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span>ثانية</div>
 </div>
 
 <div class="card">
-    <input type="text" id="gName" placeholder="الاسم الكريم">
-    <div style="display:flex; gap:10px; margin-bottom:10px;">
-        <div class="side-btn" onclick="setSide(this, 'العريس')">🤵 العريس</div>
-        <div class="side-btn" onclick="setSide(this, 'العروسة')">👰 العروسة</div>
-    </div>
-    <select id="gStatus">
-        <option value="">حالة الحضور...</option>
-        <option value="حاضر">سأكون من الحاضرين</option>
-        <option value="يحاول">سأبذل جهدي للتشريف</option>
-        <option value="معتذر">أعتذر لظروف قهرية</option>
-    </select>
-    <input type="file" id="userPhoto" accept="image/*" style="font-size:11px;">
-    <textarea id="gMsg" rows="2" placeholder="كلمة تهنئة..."></textarea>
-    <button id="sendBtn" onclick="processUserComment()" style="background:var(--pink); color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer;">إرسال</button>
-    <div id="commentsList" style="margin-top:20px;"></div>
+    <h3>إرسال تهنئة ❤️</h3>
+    <input type="text" id="gName" placeholder="الاسم">
+    <select id="gSide"><option value="العريس">تبع العريس</option><option value="العروسة">تبع العروسة</option></select>
+    <select id="gStatus"><option value="حاضر">حاضر</option><option value="يحاول">يحاول</option><option value="معتذر">معتذر</option></select>
+    <input type="file" id="userPhoto" accept="image/*">
+    <textarea id="gMsg" placeholder="رسالتك"></textarea>
+    <button onclick="handleUserSubmit()" style="background:var(--pink); color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold;">إرسال</button>
 </div>
 
-<div id="admin-panel">
-    <h3>⚙️ إدارة الحفل</h3>
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; background:#f0f0f0; padding:10px; border-radius:10px;">
-        <div>الكل: <b id="t1">0</b></div>
-        <div>عريس: <b id="t2">0</b></div>
-        <div>عروسة: <b id="t3">0</b></div>
-        <div>حاضر: <b id="t4">0</b></div>
-    </div>
-    <br>
+<div id="admin-panel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; padding:20px; overflow-y:auto;">
+    <h3>لوحة التحكم السريعة</h3>
     <input type="datetime-local" id="setCountDate">
-    <input type="text" id="setHall" placeholder="اسم القاعة">
-    <input type="text" id="setDay" placeholder="اليوم">
-    <input type="text" id="setTime" placeholder="الساعة">
-    <input type="text" id="setLoc" placeholder="رابط جوجل ماب">
-    <textarea id="setNotes" placeholder="ملاحظات إضافية"></textarea>
-    <label>تغيير صورة العروسين:</label>
+    <input type="text" id="setHall" placeholder="القاعة">
+    <input type="text" id="setLoc" placeholder="رابط اللوكيشن">
+    <label>تغيير الصورة (سيتم ضغطها تلقائياً):</label>
     <input type="file" id="adminFile" accept="image/*">
-    <button onclick="saveAdminSettings()" style="background:green; color:white; padding:15px; width:100%; border:none; border-radius:10px; margin-top:10px; font-weight:bold;">حفظ الإعدادات</button>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" style="margin-top:10px; width:100%; border:none; padding:10px;">إغلاق</button>
-    <div id="adminDetailList" style="margin-top:20px;"></div>
+    <button onclick="saveAdminSettings()" style="background:green; color:white; padding:15px; width:100%; border:none; border-radius:10px; margin-top:10px;">حفظ التغييرات</button>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="width:100%; margin-top:10px;">إغلاق</button>
 </div>
 
 <script>
@@ -116,96 +68,100 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let selectedSide = ""; let targetTime = 0;
 
-    function setSide(el, s) {
-        document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active'); selectedSide = s;
-    }
-
-    db.ref('settings').on('value', s => {
-        const v = s.val() || {};
-        if(v.date) { targetTime = new Date(v.date).getTime(); document.getElementById('setCountDate').value = v.date; }
-        document.getElementById('hallName').innerText = v.hall || "قاعة الفرح";
-        document.getElementById('eventDay').innerText = v.day || "قريباً";
-        document.getElementById('eventTime').innerText = v.time || "";
-        document.getElementById('locLink').href = v.loc || "#";
-        document.getElementById('eventNotes').innerText = v.notes || "";
-        if(v.image) { document.getElementById('displayImg').src = v.image; document.getElementById('displayImg').style.display = 'block'; }
-    });
-
-    setInterval(() => {
-        const diff = targetTime - Date.now();
-        if(diff <= 0) return;
-        document.getElementById('days').innerText = String(Math.floor(diff/(1000*60*60*24))).padStart(2,'0');
-        document.getElementById('hours').innerText = String(Math.floor((diff%(1000*60*60*24))/(1000*60*60))).padStart(2,'0');
-        document.getElementById('minutes').innerText = String(Math.floor((diff%(1000*60*60))/(1000*60))).padStart(2,'0');
-        document.getElementById('seconds').innerText = String(Math.floor((diff%(1000*60))/1000)).padStart(2,'0');
-    }, 1000);
-
-    async function uploadToImgBB(file) {
-        const formData = new FormData(); formData.append("image", file);
-        const res = await fetch("https://api.imgbb.com/1/upload?key=671239c0f991448624f2b172a6a1d48c", { method: "POST", body: formData });
-        const data = await res.json(); return data.data.url;
-    }
-
-    async function processUserComment() {
-        const n = document.getElementById('gName').value;
-        const m = document.getElementById('gMsg').value;
-        const st = document.getElementById('gStatus').value;
-        const file = document.getElementById('userPhoto').files[0];
-        if(!n || !selectedSide || !st) return alert("يرجى إكمال الاسم والجانب والحالة");
-        
-        document.getElementById('sendBtn').disabled = true;
-        document.getElementById('sendBtn').innerText = "جاري الحفظ...";
-        let img = "https://cdn-icons-png.flaticon.com/512/1144/1144760.png";
-        if(file) img = await uploadToImgBB(file);
-
-        db.ref('comments').push({ name: n, msg: m, side: selectedSide, status: st, img: img }).then(() => {
-            alert(`شكراً لك يا ${n} على تهنئتك الرقيقة ❤️`);
-            location.reload();
+    // دالة ضغط الصور العبقرية
+    async function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 600; 
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // ضغط 70%
+                };
+            };
         });
+    }
+
+    async function uploadToImgBB(base64Str) {
+        const body = new FormData();
+        body.append("image", base64Str.split(',')[1]);
+        const res = await fetch("https://api.imgbb.com/1/upload?key=671239c0f991448624f2b172a6a1d48c", { method: "POST", body: body });
+        const data = await res.json();
+        return data.data.url;
     }
 
     async function saveAdminSettings() {
         document.getElementById('loader').style.display = 'flex';
         const file = document.getElementById('adminFile').files[0];
-        let currentImg = document.getElementById('displayImg').src;
-        if(file) currentImg = await uploadToImgBB(file);
+        let url = document.getElementById('displayImg').src;
+        
+        if(file) {
+            const compressed = await compressImage(file);
+            url = await uploadToImgBB(compressed);
+        }
 
         db.ref('settings').update({
             date: document.getElementById('setCountDate').value,
             hall: document.getElementById('setHall').value,
-            day: document.getElementById('setDay').value,
-            time: document.getElementById('setTime').value,
             loc: document.getElementById('setLoc').value,
-            notes: document.getElementById('setNotes').value,
-            image: currentImg
+            image: url
         }).then(() => {
             document.getElementById('loader').style.display = 'none';
-            alert("تم الحفظ بنجاح يا سيادة النقيب");
-        }).catch(err => { alert("خطأ: " + err); document.getElementById('loader').style.display = 'none'; });
+            alert("تم التحديث بسرعة البرق!");
+        });
     }
 
-    db.ref('comments').on('value', s => {
-        const list = document.getElementById('commentsList');
-        const adm = document.getElementById('adminDetailList');
-        list.innerHTML = ""; adm.innerHTML = "";
-        let c = { t:0, g:0, b:0, y:0 };
-        s.forEach(snap => {
-            const d = snap.val(); c.t++;
-            if(d.side === 'العريس') c.g++; else c.b++;
-            if(d.status === 'حاضر') c.y++;
-            list.innerHTML += `<div class="comment-item"><img src="${d.img}" class="user-avatar"><div><b>${d.name}</b> <small>(${d.side})</small><br>${d.msg}</div></div>`;
-            adm.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; text-align:right;">
-                <button onclick="db.ref('comments/${snap.key}').remove()" style="float:left; background:red; color:white; border:none; padding:5px;">حذف</button>
-                <b>${d.name}</b> | ${d.side} | ${d.status}</div>`;
+    async function handleUserSubmit() {
+        const name = document.getElementById('gName').value;
+        const file = document.getElementById('userPhoto').files[0];
+        if(!name) return alert("الاسم مطلوب");
+        
+        document.getElementById('loader').style.display = 'flex';
+        let img = "https://cdn-icons-png.flaticon.com/512/1144/1144760.png";
+        
+        if(file) {
+            const compressed = await compressImage(file);
+            img = await uploadToImgBB(compressed);
+        }
+
+        db.ref('comments').push({
+            name: name,
+            side: document.getElementById('gSide').value,
+            status: document.getElementById('gStatus').value,
+            msg: document.getElementById('gMsg').value,
+            img: img
+        }).then(() => {
+            alert("شكراً لك يا " + name);
+            location.reload();
         });
-        document.getElementById('t1').innerText = c.t; document.getElementById('t2').innerText = c.g; document.getElementById('t3').innerText = c.b; document.getElementById('t4').innerText = c.y;
+    }
+
+    // جلب البيانات الأساسية
+    db.ref('settings').on('value', s => {
+        const v = s.val() || {};
+        document.getElementById('hallName').innerText = v.hall || "";
+        document.getElementById('eventDay').innerText = v.date || "";
+        document.getElementById('locLink').href = v.loc || "#";
+        if(v.image) { document.getElementById('displayImg').src = v.image; document.getElementById('displayImg').style.display='block'; }
     });
 
-    let clicks = 0;
-    function adminAuth() { clicks++; if(clicks>=10) { document.getElementById('admin-panel').style.display='block'; clicks=0; } }
+    function adminAuth() { 
+        let c = window.adminClicks || 0; c++; window.adminClicks = c;
+        if(c >= 10) document.getElementById('admin-panel').style.display='block';
+    }
 
     setInterval(() => {
         const r = document.createElement('div'); r.className = 'rose'; r.innerHTML = '🌸';
