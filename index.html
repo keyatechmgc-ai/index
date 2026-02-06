@@ -3,91 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M & E | Extreme Speed</title>
+    <title>Wedding Invitation | M & E</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&family=Amiri:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
     <style>
-        :root { --pink: #ff85a2; --gold: #c5a059; }
-        body { font-family: 'Cairo', sans-serif; background: #fffafb; margin: 0; text-align: center; }
-        .header { background: white; padding: 25px 10px; border-bottom: 4px solid var(--gold); border-radius: 0 0 40px 40px; }
-        .main-names { font-family: 'Cinzel', serif; font-size: 2.8rem; color: var(--pink); margin: 0; }
-        .couple-img { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--gold); object-fit: cover; margin: 10px auto; display: none; }
+        :root { --gold: #c5a059; --pink: #ff85a2; --dark: #3d0a16; --bg: #fffafb; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: var(--dark); overflow-x: hidden; }
         
-        /* العداد الملكي */
-        .timer-wrap { display: flex; justify-content: center; gap: 8px; margin-top: -25px; }
-        .t-unit { background: white; padding: 10px; border-radius: 12px; min-width: 50px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border: 1px solid var(--pink); }
-        .t-unit span { display: block; font-size: 20px; font-weight: bold; color: var(--pink); }
-        .t-unit label { font-size: 10px; color: #777; }
-
-        .card { width: 92%; max-width: 450px; margin: 30px auto; background: white; padding: 20px; border-radius: 25px; box-shadow: 0 5px 25px rgba(0,0,0,0.05); box-sizing: border-box; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border-radius: 10px; border: 1px solid #eee; font-family: 'Cairo'; font-size: 14px; }
-        
-        .side-btn { flex: 1; padding: 10px; border: 2px solid var(--pink); border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .side-btn.active { background: var(--pink); color: white; }
-
-        .comment-item { text-align: right; background: #fff9fa; padding: 10px; border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pink); display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #eee; }
-
-        .overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.9); z-index:10000; align-items:center; justify-content:center; flex-direction:column; }
-        .rose { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; }
+        /* أنيميشن القلوب المتساقطة */
+        .heart { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; color: var(--pink); font-size: 20px; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+
+        /* الهيدر الملكي */
+        .header { background: white; padding: 40px 15px; border-bottom: 5px solid var(--gold); border-radius: 0 0 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .main-title { font-family: 'Cinzel', serif; font-size: 3.5rem; color: var(--pink); margin: 0; letter-spacing: 5px; text-shadow: 2px 2px 0px rgba(0,0,0,0.02); }
+        .couple-frame { width: 180px; height: 180px; border-radius: 50%; border: 4px double var(--gold); object-fit: cover; margin: 20px auto; display: none; box-shadow: 0 0 20px rgba(197, 160, 89, 0.3); }
+
+        /* تفاصيل المناسبة */
+        .info-section { margin-top: 15px; font-family: 'Amiri', serif; }
+        .hall-name { font-size: 1.8rem; color: var(--gold); display: block; margin-bottom: 5px; }
+        .details-row { font-size: 1.1rem; color: #666; }
+        .notes-box { font-size: 0.9rem; color: #888; font-style: italic; margin-top: 10px; padding: 0 20px; }
+
+        /* العداد الانيق */
+        .timer-container { display: flex; justify-content: center; gap: 12px; margin-top: -35px; }
+        .t-box { background: white; width: 65px; height: 75px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-bottom: 3px solid var(--pink); }
+        .t-box b { font-size: 24px; color: var(--pink); line-height: 1; }
+        .t-box span { font-size: 11px; color: #999; font-weight: bold; }
+
+        /* كارت التهنئة */
+        .card { width: 90%; max-width: 500px; margin: 50px auto; background: white; padding: 30px; border-radius: 35px; box-shadow: 0 15px 50px rgba(0,0,0,0.03); border: 1px solid rgba(197, 160, 89, 0.1); }
+        h3 { font-family: 'Amiri', serif; font-size: 1.5rem; margin-bottom: 20px; color: var(--gold); }
+        
+        .input-group { position: relative; margin-bottom: 15px; }
+        input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; transition: 0.3s; background: #fdfdfd; }
+        input:focus { border-color: var(--pink); }
+
+        .btn-send { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.4); }
+
+        /* شكل الكومنتات */
+        .comment { background: #fffcfd; padding: 15px; border-radius: 20px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; border: 1px solid #fff0f3; text-align: right; }
+        .icon-circle { width: 45px; height: 45px; border-radius: 50%; background: var(--pink); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .comm-txt b { font-size: 14px; color: var(--dark); }
+        .comm-txt p { margin: 3px 0 0; font-size: 13px; color: #666; }
+
+        /* لوحة التحكم */
+        #admin { display: none; position: fixed; inset: 0; background: white; z-index: 1000; padding: 25px; overflow-y: auto; }
+        .admin-stat { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-bottom: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .location-link { display: inline-block; margin-top: 10px; color: #4285F4; text-decoration: none; font-weight: bold; border: 1px solid #4285F4; padding: 5px 15px; border-radius: 20px; font-size: 13px; }
     </style>
 </head>
 <body>
 
-<div id="loader" class="overlay">
-    <h3 style="color:var(--pink)">جاري الإرسال الصاروخي... 🚀</h3>
-</div>
-
 <div class="header">
-    <h1 class="main-names">M & E</h1>
-    <img id="displayImg" class="couple-img">
-    <div id="eventData" style="margin-top:10px; font-size: 14px;">
-        <b id="hallName"></b> <br>
-        <span id="eventDay"></span> | <span id="eventTime"></span> <br>
-        <a id="locLink" href="#" target="_blank" style="color:#4285F4; text-decoration:none; font-weight:bold;">📍 الموقع</a>
+    <h1 class="main-title">M & E</h1>
+    <img id="mainImg" class="couple-frame">
+    <div class="info-section">
+        <span id="hName" class="hall-name">...</span>
+        <div class="details-row">
+            📅 <span id="hDay">...</span> | 🕒 <span id="hTime">...</span>
+        </div>
+        <div id="hNotes" class="notes-box"></div>
+        <a id="hLoc" href="#" target="_blank" class="location-link">📍 موقع القاعة على الخريطة</a>
     </div>
 </div>
 
-<div class="timer-wrap">
-    <div class="t-unit"><span id="days">00</span><label>يوم</label></div>
-    <div class="t-unit"><span id="hours">00</span><label>ساعة</label></div>
-    <div class="t-unit"><span id="minutes">00</span><label>دقيقة</label></div>
-    <div class="t-unit" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span><label>ثانية</label></div>
+<div class="timer-container">
+    <div class="t-box"><b id="days">00</b><span>يوم</span></div>
+    <div class="t-box"><b id="hours">00</b><span>ساعة</span></div>
+    <div class="t-box"><b id="mins">00</b><span>دقيقة</span></div>
+    <div class="t-box" onclick="tryAdmin()"><b id="secs">00</b><span>ثانية</span></div>
 </div>
 
 <div class="card">
-    <input type="text" id="uName" placeholder="الاسم الكريم">
-    <div style="display:flex; gap:10px;">
-        <div class="side-btn" onclick="setSide(this, 'العريس')">🤵 العريس</div>
-        <div class="side-btn" onclick="setSide(this, 'العروسة')">👰 العروسة</div>
-    </div>
-    <select id="uStatus">
-        <option value="حاضر">حاضر بإذن الله</option>
-        <option value="يحاول">سأحاول الحضور</option>
-        <option value="معتذر">أعتذر لظروف</option>
+    <h3>شاركنا فرحتنا ❤️</h3>
+    <input type="text" id="guestName" placeholder="الاسم الكريم">
+    
+    <select id="guestSide" style="margin-top:10px;">
+        <option value="">أنت من طرف...</option>
+        <option value="عريس">طرف العريس 🤵</option>
+        <option value="عروسة">طرف العروسة 👰</option>
     </select>
-    <div style="text-align:right; font-size:11px; color:var(--pink);">صورة بروفيل (اختياري):</div>
-    <input type="file" id="uFile" accept="image/*">
-    <textarea id="uMsg" rows="2" placeholder="كلمة تهنئة..."></textarea>
-    <button onclick="handleSend()" style="background:var(--pink); color:white; border:none; padding:15px; width:100%; border-radius:12px; font-weight:bold; cursor:pointer;">إرسال الآن</button>
-    <div id="list" style="margin-top: 20px;"></div>
+
+    <select id="guestStatus" style="margin-top:10px;">
+        <option value="حاضر">بإذن الله سأحضر</option>
+        <option value="يحاول">سأبذل جهدي للتشريف</option>
+        <option value="معتذر">أعتذر لظروف قهرية</option>
+    </select>
+
+    <textarea id="guestMsg" rows="3" placeholder="كلمة تهنئة من القلب..." style="margin-top:10px;"></textarea>
+    
+    <button onclick="sendBlessing()" class="btn-send">إرسال التهنئة</button>
+
+    <div id="commentsFeed" style="margin-top: 30px;"></div>
 </div>
 
-<div id="admin-panel" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; padding:20px; overflow-y:auto; box-sizing:border-box;">
-    <h3>لوحة التحكم</h3>
-    <input type="datetime-local" id="aDate">
-    <input type="text" id="aHall" placeholder="اسم القاعة">
-    <input type="text" id="aDay" placeholder="اليوم">
-    <input type="text" id="aTime" placeholder="الساعة">
-    <input type="text" id="aLoc" placeholder="لينك الموقع">
-    <input type="text" id="aImg" placeholder="رابط صورة العروسين">
-    <button onclick="saveAdmin()" style="background:green; color:white; width:100%; padding:15px; border:none; border-radius:10px;">حفظ</button>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" style="width:100%; margin-top:10px;">خروج</button>
+<div id="admin">
+    <h2 style="color:var(--pink)">لوحة تحكم سيادة النقيب ⚙️</h2>
+    <div class="admin-stat">
+        <div style="color:blue">إجمالي الحضور: <b id="statAll">0</b></div>
+        <div style="color:green">حاضر فعلياً: <b id="statYes">0</b></div>
+        <div style="color:purple">طرف العريس: <b id="statG">0</b></div>
+        <div style="color:deeppink">طرف العروسة: <b id="statB">0</b></div>
+    </div>
+
+    <label>رابط صورة العروسين:</label>
+    <input type="text" id="inImg" placeholder="Link URL">
+    <input type="text" id="inHall" placeholder="اسم القاعة">
+    <input type="text" id="inDay" placeholder="اليوم">
+    <input type="text" id="inTime" placeholder="الساعة">
+    <input type="text" id="inLoc" placeholder="رابط جوجل ماب">
+    <input type="datetime-local" id="inDate">
+    <textarea id="inNotes" placeholder="ملاحظات (مثلاً: ممنوع اصطحاب الأطفال)"></textarea>
+
+    <button onclick="saveAdmin()" style="background:green; color:white; padding:15px; width:100%; border:none; border-radius:10px; font-weight:bold; margin-top:10px;">حفظ التغييرات</button>
+    <button onclick="document.getElementById('admin').style.display='none'" style="width:100%; margin-top:10px; background:#eee; border:none; padding:10px;">إغلاق</button>
+    
+    <div id="adminList" style="margin-top:20px; border-top:2px solid #eee; padding-top:20px;"></div>
 </div>
 
 <script>
+    // Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
         authDomain: "engagmen.firebaseapp.com",
@@ -99,101 +137,105 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let selSide = ""; let target = 0;
+    let targetDate = 0;
 
-    function setSide(el, s) {
-        document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-        el.classList.add('active'); selSide = s;
-    }
-
-    // الضاغط الفائق (أقصى ضغط ممكن)
-    async function superCompress(file) {
-        return new Promise(res => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = e => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const size = 120; // حجم مجهري للسرعة القصوى
-                    canvas.width = size; canvas.height = size;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, size, size);
-                    res(canvas.toDataURL('image/jpeg', 0.5)); // جودة 50% فقط للسرعة
-                }
-            }
-        });
-    }
-
-    async function handleSend() {
-        const n = document.getElementById('uName').value;
-        const f = document.getElementById('uFile').files[0];
-        if(!n || !selSide) return alert("الاسم مطلوب");
+    // جلب البيانات الأساسية
+    db.ref('settings').on('value', s => {
+        const v = s.val() || {};
+        if(v.date) targetDate = new Date(v.date).getTime();
+        document.getElementById('hName').innerText = v.hall || "فرحتنا الكبيرة";
+        document.getElementById('hDay').innerText = v.day || "قريباً";
+        document.getElementById('hTime').innerText = v.time || "";
+        document.getElementById('hLoc').href = v.loc || "#";
+        document.getElementById('hNotes').innerText = v.notes || "";
+        if(v.img) { document.getElementById('mainImg').src = v.img; document.getElementById('mainImg').style.display = 'block'; }
         
-        document.getElementById('loader').style.display = 'flex';
-        let img = "https://cdn-icons-png.flaticon.com/512/1144/1144760.png";
-        
-        if(f) {
-            const compressed = await superCompress(f);
-            const body = new FormData();
-            body.append("image", compressed.split(',')[1]);
-            const r = await fetch("https://api.imgbb.com/1/upload?key=671239c0f991448624f2b172a6a1d48c", {method:"POST", body:body});
-            const d = await r.json();
-            img = d.data.url;
-        }
-
-        db.ref('comments').push({
-            name: n, side: selSide, status: document.getElementById('uStatus').value,
-            msg: document.getElementById('uMsg').value, img: img
-        }).then(() => location.reload());
-    }
-
-    db.ref('settings').on('value', snap => {
-        const v = snap.val() || {};
-        if(v.date) target = new Date(v.date).getTime();
-        document.getElementById('hallName').innerText = v.hall || "فرحتنا";
-        document.getElementById('eventDay').innerText = v.day || "";
-        document.getElementById('eventTime').innerText = v.time || "";
-        document.getElementById('locLink').href = v.loc || "#";
-        if(v.image) { document.getElementById('displayImg').src = v.image; document.getElementById('displayImg').style.display='block'; }
+        // تعبئة حقول الأدمن تلقائياً
+        document.getElementById('inImg').value = v.img || "";
+        document.getElementById('inHall').value = v.hall || "";
+        document.getElementById('inDay').value = v.day || "";
+        document.getElementById('inTime').value = v.time || "";
+        document.getElementById('inLoc').value = v.loc || "";
+        document.getElementById('inDate').value = v.date || "";
+        document.getElementById('inNotes').value = v.notes || "";
     });
 
+    // العداد
     setInterval(() => {
-        const diff = target - Date.now();
+        const diff = targetDate - Date.now();
         if(diff <= 0) return;
-        document.getElementById('days').innerText = String(Math.floor(diff/(1000*60*60*24))).padStart(2,'0');
-        document.getElementById('hours').innerText = String(Math.floor((diff%(1000*60*60*24))/(1000*60*60))).padStart(2,'0');
-        document.getElementById('minutes').innerText = String(Math.floor((diff%(1000*60*60))/(1000*60))).padStart(2,'0');
-        document.getElementById('seconds').innerText = String(Math.floor((diff%(1000*60))/1000)).padStart(2,'0');
+        document.getElementById('days').innerText = Math.floor(diff/(1000*60*60*24));
+        document.getElementById('hours').innerText = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        document.getElementById('mins').innerText = Math.floor((diff%(1000*60*60))/(1000*60));
+        document.getElementById('secs').innerText = Math.floor((diff%(1000*60))/1000);
     }, 1000);
+
+    function sendBlessing() {
+        const name = document.getElementById('guestName').value;
+        const side = document.getElementById('guestSide').value;
+        const msg = document.getElementById('guestMsg').value;
+        const status = document.getElementById('guestStatus').value;
+
+        if(!name || !side) return alert("فضلاً اكتب اسمك واختر الطرف (عريس/عروسة)");
+
+        db.ref('comments').push({ name, side, msg, status }).then(() => {
+            alert(`شكراً لك يا ${name} على تهنئتك الرقيقة.. ننتظرك بكل حب ❤️`);
+            location.reload();
+        });
+    }
 
     function saveAdmin() {
         db.ref('settings').update({
-            date: document.getElementById('aDate').value,
-            hall: document.getElementById('aHall').value,
-            day: document.getElementById('aDay').value,
-            time: document.getElementById('aTime').value,
-            loc: document.getElementById('aLoc').value,
-            image: document.getElementById('aImg').value
-        }).then(() => alert("تم الحفظ"));
+            img: document.getElementById('inImg').value,
+            hall: document.getElementById('inHall').value,
+            day: document.getElementById('inDay').value,
+            time: document.getElementById('inTime').value,
+            loc: document.getElementById('inLoc').value,
+            date: document.getElementById('inDate').value,
+            notes: document.getElementById('inNotes').value
+        }).then(() => alert("تم حفظ التعديلات بنجاح!"));
     }
 
     db.ref('comments').on('value', snap => {
-        const l = document.getElementById('list'); l.innerHTML = "";
+        const feed = document.getElementById('commentsFeed');
+        const admList = document.getElementById('adminList');
+        feed.innerHTML = ""; admList.innerHTML = "";
+        let counts = { all:0, yes:0, g:0, b:0 };
+
         snap.forEach(c => {
             const d = c.val();
-            l.innerHTML += `<div class="comment-item"><img src="${d.img}" class="avatar"><div><b>${d.name}</b> <small>(${d.side})</small><br><span style="font-size:12px;">${d.msg}</span></div></div>`;
+            counts.all++;
+            if(d.status === 'حاضر') counts.yes++;
+            if(d.side === 'عريس') counts.g++; else counts.b++;
+
+            // عرض للزوار
+            feed.innerHTML += `<div class="comment">
+                <div class="icon-circle">${d.side === 'عريس' ? '🤵' : '👰'}</div>
+                <div class="comm-txt"><b>${d.name}</b> <small style="color:var(--pink)">(${d.status})</small><p>${d.msg}</p></div>
+            </div>`;
+
+            // عرض للأدمن
+            admList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">
+                <button onclick="db.ref('comments/${c.key}').remove()" style="float:left; color:red; border:none; background:none; cursor:pointer;">حذف</button>
+                <b>${d.name}</b> - من طرف ال${d.side} (${d.status})
+            </div>`;
         });
+
+        document.getElementById('statAll').innerText = counts.all;
+        document.getElementById('statYes').innerText = counts.yes;
+        document.getElementById('statG').innerText = counts.g;
+        document.getElementById('statB').innerText = counts.b;
     });
 
-    let cl = 0; function adminAuth() { cl++; if(cl>=10) document.getElementById('admin-panel').style.display='block'; }
-    
+    let clickTimer = 0;
+    function tryAdmin() { clickTimer++; if(clickTimer >= 10) { document.getElementById('admin').style.display='block'; clickTimer=0; } }
+
+    // قلوب متساقطة
     setInterval(() => {
-        const p = document.createElement('div'); p.className='rose'; p.innerHTML='🌸';
-        p.style.left = Math.random()*100+'vw'; p.style.animationDuration = (Math.random()*2+3)+'s';
-        document.body.appendChild(p); setTimeout(()=>p.remove(), 5000);
-    }, 800);
+        const h = document.createElement('div'); h.className = 'heart'; h.innerHTML = '❤️';
+        h.style.left = Math.random() * 100 + 'vw'; h.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(h); setTimeout(() => h.remove(), 5000);
+    }, 1000);
 </script>
 </body>
 </html>
