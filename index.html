@@ -3,79 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wedding Invitation | M & E</title>
+    <title>M & E | Wedding Invite</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --pink: #ff85a2; --dark: #2d0a13; --bg: #fffafb; }
-        
         * { box-sizing: border-box; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--dark); }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--dark); overflow-x: hidden; }
 
-        /* تساقط قلوب */
-        .heart { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; color: var(--pink); }
+        .heart { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; color: var(--pink); font-size: 20px; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
 
-        /* الهيدر الفخم */
         .header { width: 100%; max-width: 600px; background: white; padding: 40px 20px; text-align: center; border-bottom: 5px solid var(--gold); border-radius: 0 0 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .main-names { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 8vw, 3.5rem); color: var(--pink); margin: 0; letter-spacing: 5px; }
-        .couple-img { width: 180px; height: 180px; border-radius: 50%; border: 4px double var(--gold); object-fit: cover; margin: 20px auto; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .event-info { font-family: 'Amiri', serif; margin-top: 15px; }
-        .hall-title { font-size: 1.8rem; color: var(--gold); display: block; }
+        .couple-img { width: 160px; height: 160px; border-radius: 50%; border: 4px double var(--gold); object-fit: cover; margin: 20px auto; display: none; }
 
-        /* العداد المنظم */
-        .timer-wrap { display: flex; justify-content: center; gap: 10px; margin-top: -35px; width: 100%; max-width: 400px; }
+        .timer-wrap { display: flex; justify-content: center; gap: 10px; margin-top: -35px; width: 90%; max-width: 400px; }
         .t-card { background: white; flex: 1; padding: 12px 5px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-bottom: 3px solid var(--pink); display: flex; flex-direction: column; align-items: center; }
-        .t-card b { font-size: 1.5rem; color: var(--pink); }
+        .t-card b { font-size: 1.4rem; color: var(--pink); }
         .t-card span { font-size: 0.7rem; color: #888; font-weight: bold; }
 
-        /* الكروت والمدخلات */
         .container { width: 92%; max-width: 500px; margin: 50px auto; }
-        .card { background: white; padding: 30px; border-radius: 30px; box-shadow: 0 15px 45px rgba(0,0,0,0.04); border: 1px solid rgba(197, 160, 89, 0.1); text-align: center; }
-        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--pink); }
-        .btn-main { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+        .card { background: white; padding: 30px 20px; border-radius: 35px; box-shadow: 0 15px 45px rgba(0,0,0,0.04); border: 1px solid rgba(197, 160, 89, 0.1); text-align: center; }
+        
+        /* تصميم أيقونات العريس والعروسة */
+        .side-selection { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+        .side-option { flex: 1; background: #fdfdfd; border: 2px solid #eee; border-radius: 20px; padding: 15px 10px; cursor: pointer; transition: 0.3s; position: relative; }
+        .side-option img { width: 50px; height: 50px; margin-bottom: 10px; }
+        .side-option span { display: block; font-weight: bold; font-size: 14px; color: #777; }
+        .side-option.active { border-color: var(--gold); background: #fff9f0; transform: scale(1.05); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.2); }
+        .side-option.active span { color: var(--gold); }
+        .check-mark { position: absolute; top: 8px; left: 8px; color: var(--gold); display: none; }
+        .side-option.active .check-mark { display: block; }
 
-        /* رسالة النجاح (المودال) */
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; padding: 30px; border-radius: 25px; text-align: center; max-width: 400px; width: 100%; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0.7); } to { transform: scale(1); } }
+        input, select, textarea { width: 100%; padding: 14px; margin: 8px 0; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; }
+        .btn-main { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 16px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.4); margin-top: 10px; }
 
-        /* قائمة التهاني */
-        .comment-item { background: #fffcfd; padding: 15px; border-radius: 20px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 15px; text-align: right; }
-        .side-icon { width: 45px; height: 45px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; color: white; }
+        /* المودال الرايق */
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 30px; text-align: center; max-width: 400px; width: 100%; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* الأدمن المطور */
+        .comment-item { background: #fffcfd; padding: 15px; border-radius: 20px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 15px; text-align: right; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .side-avatar { font-size: 24px; background: #fff0f3; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
         #admin-panel { display: none; position: fixed; inset: 0; background: #f8f9fa; z-index: 9999; padding: 20px; overflow-y: auto; }
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .filter-tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab-btn { flex: 1; padding: 8px; border: 1px solid var(--pink); border-radius: 10px; background: white; font-size: 12px; cursor: pointer; }
-        .tab-btn.active { background: var(--pink); color: white; }
+        .stat-card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-top: 3px solid var(--gold); }
     </style>
 </head>
 <body>
 
 <div id="successModal" class="custom-modal">
     <div class="modal-content">
-        <div style="font-size: 50px;">❤️</div>
-        <h2 style="color: var(--pink); margin: 10px 0;">تسلم يا غالي!</h2>
-        <p id="successText" style="color: #666;"></p>
-        <button onclick="closeModal()" class="btn-main">حبيبي تسلم</button>
+        <div style="font-size: 60px;">💌</div>
+        <h2 style="color: var(--pink);">تم الإرسال بنجاح!</h2>
+        <p id="successText" style="color: #666; line-height: 1.6;"></p>
+        <button onclick="location.reload()" class="btn-main">حبيبي تسلم</button>
     </div>
 </div>
 
 <div class="header">
     <h1 class="main-names">M & E</h1>
     <img id="headImg" class="couple-img">
-    <div class="event-info">
-        <span id="txtHall" class="hall-title">...</span>
-        <div style="color: #666; margin-top: 5px;">
-            📅 <span id="txtDay">...</span> | 🕒 <span id="txtTime">...</span>
-        </div>
-        <div id="txtNotes" style="font-size: 0.9rem; color: #888; margin-top: 8px; font-style: italic;"></div>
-        <a id="lnkLoc" href="#" target="_blank" style="display:inline-block; margin-top:12px; color:#4285F4; text-decoration:none; font-weight:bold; border: 1px solid #4285F4; padding: 5px 15px; border-radius: 20px; font-size: 13px;">📍 موقع القاعة</a>
+    <div style="font-family: 'Amiri', serif; margin-top: 10px;">
+        <span id="txtHall" style="font-size: 1.6rem; color: var(--gold);">...</span><br>
+        📅 <span id="txtDay">...</span> | 🕒 <span id="txtTime">...</span>
+        <div id="txtNotes" style="font-size: 0.9rem; color: #888; margin-top: 5px; font-style: italic;"></div>
+        <a id="lnkLoc" href="#" target="_blank" style="display:inline-block; margin-top:10px; color:#4285F4; text-decoration:none; font-weight:bold; font-size: 13px;">📍 الخريطة</a>
     </div>
 </div>
 
@@ -83,58 +79,60 @@
     <div class="t-card"><b id="d">00</b><span>أيام</span></div>
     <div class="t-card"><b id="h">00</b><span>ساعات</span></div>
     <div class="t-card"><b id="m">00</b><span>دقائق</span></div>
-    <div class="t-card" onclick="openAdminCheck()"><b id="s">00</b><span>ثواني</span></div>
+    <div class="t-card" onclick="adminCheck()"><b id="s">00</b><span>ثواني</span></div>
 </div>
 
 <div class="container">
     <div class="card">
-        <h3>ننتظرك لتكتمل فرحتنا ❤️</h3>
+        <h3>يسعدنا تشريفكم ❤️</h3>
         <input type="text" id="inName" placeholder="الاسم الكريم">
-        <select id="inSide">
-            <option value="">أنت من طرف...</option>
-            <option value="العريس">طرف العريس 🤵</option>
-            <option value="العروسة">طرف العروسة 👰</option>
-        </select>
+        
+        <p style="font-size: 13px; color: #999; margin-top: 15px;">أنت من طرف مَن؟</p>
+        <div class="side-selection">
+            <div class="side-option" onclick="selectSide('العريس', this)">
+                <span class="check-mark">✔</span>
+                <img src="https://cdn-icons-png.flaticon.com/512/3663/3663361.png" alt="Groom">
+                <span>طرف العريس</span>
+            </div>
+            <div class="side-option" onclick="selectSide('العروسة', this)">
+                <span class="check-mark">✔</span>
+                <img src="https://cdn-icons-png.flaticon.com/512/3663/3663335.png" alt="Bride">
+                <span>طرف العروسة</span>
+            </div>
+        </div>
+
         <select id="inStatus">
             <option value="حاضر">بإذن الله سأحضر</option>
             <option value="يحاول">سأبذل جهدي</option>
             <option value="معتذر">أعتذر لظروف</option>
         </select>
         <textarea id="inMsg" rows="3" placeholder="كلمة تهنئة..."></textarea>
-        <button onclick="submitBlessing()" class="btn-main">إرسال التهنئة</button>
+        <button onclick="send()" class="btn-main">إرسال التهنئة</button>
         
         <div id="feed" style="margin-top: 30px;"></div>
     </div>
 </div>
 
 <div id="admin-panel">
-    <h2 style="text-align:center; color:var(--pink);">لوحة تحكم الإدارة ⚙️</h2>
+    <h2 style="text-align:center;">لوحة التحكم ⚙️</h2>
     <div class="stat-grid">
-        <div class="stat-card"><small>الإجمالي</small><br><b id="sAll">0</b></div>
-        <div class="stat-card"><small>حاضر</small><br><b id="sYes">0</b></div>
-        <div class="stat-card"><small>العريس</small><br><b id="sArr">0</b></div>
-        <div class="stat-card"><small>العروسة</small><br><b id="sAro">0</b></div>
+        <div class="stat-card">إجمالي<br><b id="sAll">0</b></div>
+        <div class="stat-card">حاضر<br><b id="sYes">0</b></div>
+        <div class="stat-card">العريس<br><b id="sArr">0</b></div>
+        <div class="stat-card">العروسة<br><b id="sAro">0</b></div>
     </div>
-
-    <div class="card" style="padding: 15px; margin-bottom: 20px;">
-        <h4>تحديث البيانات</h4>
+    <div class="card" style="padding: 15px;">
         <input type="text" id="aImg" placeholder="رابط صورة العروسين">
         <input type="text" id="aHall" placeholder="اسم القاعة">
         <input type="text" id="aDay" placeholder="اليوم">
         <input type="text" id="aTime" placeholder="الساعة">
-        <input type="text" id="aLoc" placeholder="رابط الموقع">
+        <input type="text" id="aLoc" placeholder="لينك الخريطة">
         <input type="datetime-local" id="aDate">
-        <textarea id="aNotes" placeholder="ملاحظات إضافية"></textarea>
-        <button onclick="updateSettings()" class="btn-main" style="background:green;">حفظ التعديلات</button>
+        <textarea id="aNotes" placeholder="ملاحظات"></textarea>
+        <button onclick="saveAdmin()" class="btn-main" style="background:green;">حفظ</button>
     </div>
-
-    <div class="filter-tabs">
-        <button class="tab-btn active" onclick="filterComments('الكل', this)">الكل</button>
-        <button class="tab-btn" onclick="filterComments('العريس', this)">طرف العريس</button>
-        <button class="tab-btn" onclick="filterComments('العروسة', this)">طرف العروسة</button>
-    </div>
-    <div id="aList"></div>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" class="btn-main" style="background:#666; margin-top:20px;">خروج</button>
+    <div id="aList" style="margin-top:20px;"></div>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" class="btn-main" style="background:#666;">إغلاق</button>
 </div>
 
 <script>
@@ -149,9 +147,14 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let target = 0; let allComments = [];
+    let selectedSide = ""; let target = 0;
 
-    // جلب البيانات
+    function selectSide(side, el) {
+        document.querySelectorAll('.side-option').forEach(opt => opt.classList.remove('active'));
+        el.classList.add('active');
+        selectedSide = side;
+    }
+
     db.ref('settings').on('value', s => {
         const v = s.val() || {};
         if(v.date) target = new Date(v.date).getTime();
@@ -161,8 +164,7 @@
         document.getElementById('lnkLoc').href = v.loc || "#";
         document.getElementById('txtNotes').innerText = v.notes || "";
         if(v.img) { document.getElementById('headImg').src = v.img; document.getElementById('headImg').style.display='block'; }
-        
-        // تعبئة الأدمن
+        // Admin Fill
         document.getElementById('aImg').value = v.img || "";
         document.getElementById('aHall').value = v.hall || "";
         document.getElementById('aDay').value = v.day || "";
@@ -172,7 +174,6 @@
         document.getElementById('aNotes').value = v.notes || "";
     });
 
-    // العداد
     setInterval(() => {
         const diff = target - Date.now();
         if(diff <= 0) return;
@@ -182,80 +183,45 @@
         document.getElementById('s').innerText = Math.floor((diff%(1000*60))/1000);
     }, 1000);
 
-    function submitBlessing() {
-        const name = document.getElementById('inName').value;
-        const side = document.getElementById('inSide').value;
-        const msg = document.getElementById('inMsg').value;
-        const status = document.getElementById('inStatus').value;
-
-        if(!name || !side) return alert("يرجى كتابة الاسم واختيار الطرف");
-
-        db.ref('comments').push({ name, side, msg, status }).then(() => {
-            document.getElementById('successText').innerText = `يا ${name}، تهنئتك وصلت لسيادة النقيب وعروسه.. ننتظرك بكل حب!`;
+    function send() {
+        const n = document.getElementById('inName').value;
+        if(!n || !selectedSide) return alert("من فضلك ادخل الاسم واختر الطرف");
+        db.ref('comments').push({
+            name: n, side: selectedSide, status: document.getElementById('inStatus').value, msg: document.getElementById('inMsg').value
+        }).then(() => {
+            document.getElementById('successText').innerText = `يا ${n}، شكراً لمشاركتنا الفرحة.. ننتظرك بكل حب! ❤️`;
             document.getElementById('successModal').style.display = 'flex';
         });
     }
 
-    function closeModal() { location.reload(); }
-
-    function updateSettings() {
+    function saveAdmin() {
         db.ref('settings').update({
-            img: document.getElementById('aImg').value,
-            hall: document.getElementById('aHall').value,
-            day: document.getElementById('aDay').value,
-            time: document.getElementById('aTime').value,
-            loc: document.getElementById('aLoc').value,
-            date: document.getElementById('aDate').value,
-            notes: document.getElementById('aNotes').value
+            img: document.getElementById('aImg').value, hall: document.getElementById('aHall').value, day: document.getElementById('aDay').value,
+            time: document.getElementById('aTime').value, loc: document.getElementById('aLoc').value, date: document.getElementById('aDate').value, notes: document.getElementById('aNotes').value
         }).then(() => alert("تم الحفظ"));
     }
 
     db.ref('comments').on('value', snap => {
-        allComments = [];
-        const feed = document.getElementById('feed');
-        feed.innerHTML = "";
+        const feed = document.getElementById('feed'); const aList = document.getElementById('aList');
+        feed.innerHTML = ""; aList.innerHTML = "";
         let c = { all:0, yes:0, g:0, b:0 };
-
         snap.forEach(child => {
-            const d = child.val(); d.key = child.key;
-            allComments.push(d);
-            c.all++;
+            const d = child.val(); c.all++;
             if(d.status === 'حاضر') c.yes++;
             if(d.side === 'العريس') c.g++; else c.b++;
-
             feed.innerHTML += `<div class="comment-item">
-                <div class="side-icon">${d.side === 'العريس' ? '🤵' : '👰'}</div>
-                <div><b>${d.name}</b> <small style="color:var(--pink)">(${d.status})</small><br><span style="font-size:13px; color:#666;">${d.msg}</span></div>
+                <div class="side-avatar">${d.side === 'العريس' ? '🤵' : '👰'}</div>
+                <div><b>${d.name}</b> <small style="color:var(--pink)">(${d.status})</small><br><span style="font-size:12px;color:#666">${d.msg}</span></div>
             </div>`;
+            aList.innerHTML += `<div style="background:white; padding:10px; margin-bottom:5px; border-radius:10px;">
+                <button onclick="db.ref('comments/${child.key}').remove()" style="float:left; color:red; border:none; background:none;">حذف</button>
+                ${d.name} (${d.side})</div>`;
         });
-
-        document.getElementById('sAll').innerText = c.all;
-        document.getElementById('sYes').innerText = c.yes;
-        document.getElementById('sArr').innerText = c.g;
-        document.getElementById('sAro').innerText = c.b;
-        renderAdminList(allComments);
+        document.getElementById('sAll').innerText = c.all; document.getElementById('sYes').innerText = c.yes;
+        document.getElementById('sArr').innerText = c.g; document.getElementById('sAro').innerText = c.b;
     });
 
-    function renderAdminList(list) {
-        const aList = document.getElementById('aList');
-        aList.innerHTML = "";
-        list.forEach(d => {
-            aList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #ddd; background:white; margin-bottom:5px; border-radius:8px;">
-                <button onclick="db.ref('comments/${d.key}').remove()" style="float:left; color:red; border:none; background:none;">حذف</button>
-                <b>${d.name}</b> <br> <small>${d.side} - ${d.status}</small>
-            </div>`;
-        });
-    }
-
-    function filterComments(side, btn) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        if(side === 'الكل') renderAdminList(allComments);
-        else renderAdminList(allComments.filter(c => c.side === side));
-    }
-
-    let clks = 0;
-    function openAdminCheck() { clks++; if(clks>=10) { document.getElementById('admin-panel').style.display='block'; clks=0; } }
+    let clk = 0; function adminCheck() { clk++; if(clk>=10) { document.getElementById('admin-panel').style.display='block'; clk=0; } }
 
     setInterval(() => {
         const h = document.createElement('div'); h.className='heart'; h.innerHTML='❤️';
