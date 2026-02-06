@@ -6,82 +6,101 @@
     <title>دعوة زفاف ملكية | سيادة النقيب</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&family=Reem+Kufi:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --gold: #c5a059; --dark-red: #590d22; --white: #ffffff; }
-        body { font-family: 'Cairo', sans-serif; background: #fff5f7; margin: 0; color: var(--dark-red); overflow-x: hidden; }
+        /* تصميم كلاسيكي فاخر */
+        :root { --gold: #D4AF37; --royal-red: #600000; --bg: #fdfbfb; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; color: #333; overflow-x: hidden; }
         
-        /* تصميم الخلفية والستائر */
-        .hero { background: linear-gradient(rgba(89, 13, 34, 0.8), rgba(89, 13, 34, 0.8)), url('https://www.transparenttextures.com/patterns/gold-floral.png');
-                height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--gold); border-bottom: 5px solid var(--gold); }
-        h1 { font-family: 'Reem Kufi', sans-serif; font-size: 3rem; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        /* الهيدر الملكي */
+        .royal-header { 
+            background: linear-gradient(rgba(96, 0, 0, 0.9), rgba(96, 0, 0, 0.9)), url('https://www.transparenttextures.com/patterns/gold-floral.png');
+            padding: 60px 20px; text-align: center; color: var(--gold); border-bottom: 8px double var(--gold); 
+        }
+        .royal-header h1 { font-family: 'Amiri', serif; font-size: 3.5rem; margin: 0; letter-spacing: 2px; }
         
-        /* العداد الماسي */
-        .countdown { display: flex; justify-content: center; gap: 15px; margin-top: -50px; }
-        .time-box { background: var(--white); width: 80px; height: 90px; border-radius: 15px; display: flex; flex-direction: column; 
-                    align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 2px solid var(--gold); }
-        .time-box span { font-size: 24px; font-weight: bold; color: var(--dark-red); }
-        .time-box label { font-size: 12px; color: var(--gold); font-weight: bold; }
+        /* العداد الفخم */
+        .countdown-container { display: flex; justify-content: center; gap: 15px; margin-top: -40px; }
+        .counter-card { 
+            background: white; width: 85px; padding: 15px 5px; border-radius: 10px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 2px solid var(--gold);
+        }
+        .counter-card span { display: block; font-size: 28px; font-weight: bold; color: var(--royal-red); }
+        .counter-card label { font-size: 14px; color: var(--gold); font-weight: bold; }
 
-        /* تأكيد الحضور (RSVP) */
-        .rsvp-section { max-width: 600px; margin: 40px auto; background: white; padding: 30px; border-radius: 30px; border: 1px solid var(--gold); }
-        .rsvp-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 20px 0; }
-        .rsvp-btn { padding: 10px 20px; border: 2px solid var(--gold); border-radius: 25px; cursor: pointer; background: none; font-weight: bold; transition: 0.3s; }
-        .rsvp-btn.active { background: var(--gold); color: white; }
+        /* الأقسام */
+        .section-card { 
+            max-width: 600px; margin: 50px auto; background: white; padding: 30px; 
+            border-radius: 2px; border: 1px solid #eee; position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+        .section-card::before { content: ""; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 1px solid var(--gold); pointer-events: none; }
 
-        /* الأنيميشن */
-        .floating-rose { position: fixed; pointer-events: none; z-index: 100; font-size: 25px; animation: fall 4s linear infinite; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
+        /* أزرار الحضور */
+        .rsvp-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 25px 0; }
+        .rsvp-option { 
+            padding: 15px; border: 1px solid #ddd; cursor: pointer; transition: 0.3s; 
+            font-weight: bold; background: #fff; color: var(--royal-red);
+        }
+        .rsvp-option:hover, .rsvp-option.active { background: var(--royal-red); color: white; border-color: var(--royal-red); }
 
-        /* لوحة التحكم المخفية */
-        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; padding: 40px; box-sizing: border-box; }
-        .couple-img { width: 200px; height: 200px; border-radius: 50%; border: 6px solid var(--gold); object-fit: cover; margin-top: 20px; box-shadow: 0 0 20px var(--gold); }
+        /* أنيميشن الورد */
+        .flower { position: fixed; top: -10%; font-size: 20px; z-index: 1000; pointer-events: none; animation: fall 5s linear infinite; }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        /* المدخلات */
+        input, textarea { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ccc; box-sizing: border-box; font-family: 'Cairo'; }
+        .btn-gold { background: var(--gold); color: white; border: none; padding: 18px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; }
+
+        /* لوحة التحكم */
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; padding: 40px; overflow-y: auto; box-sizing: border-box; }
+        .couple-img { width: 180px; height: 180px; border-radius: 50%; border: 4px solid var(--gold); margin: 20px auto; display: none; object-fit: cover; }
     </style>
 </head>
 <body>
 
-<div class="hero">
-    <img id="mainImage" src="" class="couple-img" style="display:none;">
+<div class="royal-header">
+    <img id="mainImage" src="" class="couple-img">
     <h1>M & E</h1>
-    <p style="font-size: 1.2rem; font-weight: 300;">نتشرف بدعوتكم لمشاركتنا فرحة العمر</p>
+    <p style="font-size: 1.4rem;">فرحة العمر تكتمل بتشريفكم</p>
 </div>
 
-<div class="countdown">
-    <div class="time-box"><span id="days">00</span><label>يوم</label></div>
-    <div class="time-box"><span id="hours">00</span><label>ساعة</label></div>
-    <div class="time-box"><span id="minutes">00</span><label>دقيقة</label></div>
-    <div class="time-box" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span><label>ثانية</label></div>
+<div class="countdown-container">
+    <div class="counter-card"><span id="days">00</span><label>يوم</label></div>
+    <div class="counter-card"><span id="hours">00</span><label>ساعة</label></div>
+    <div class="counter-card"><span id="minutes">00</span><label>دقيقة</label></div>
+    <div class="counter-card" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">00</span><label>ثانية</label></div>
 </div>
 
-<div class="rsvp-section">
-    <h3 style="text-align: center;">تشريف سيادتكم للفرح ❤️</h3>
-    <input type="text" id="userName" placeholder="الاسم الكريم">
+<div class="section-card">
+    <h2 style="text-align: center; color: var(--royal-red); font-family: 'Amiri';">تأكيد تشريف سيادتكم</h2>
+    <input type="text" id="userName" placeholder="الاسم الكريم لسيادتكم">
     
-    <div class="rsvp-options">
-        <button class="rsvp-btn" onclick="setRSVP(this, 'بإذن الله سأكون من الحاضرين')">بإذن الله سأكون من الحاضرين</button>
-        <button class="rsvp-btn" onclick="setRSVP(this, 'سأبذل جهدي للتشريف')">سأبذل جهدي للتشريف</button>
-        <button class="rsvp-btn" onclick="setRSVP(this, 'أعتذر لظروف قهرية')">أعتذر لظروف قهرية</button>
+    <div class="rsvp-grid">
+        <div class="rsvp-option" onclick="selectRSVP(this, 'بإذن الله سأكون من الحاضرين')">بإذن الله سأكون من الحاضرين</div>
+        <div class="rsvp-option" onclick="selectRSVP(this, 'سأبذل جهدي للتشريف')">سأبذل جهدي للتشريف</div>
+        <div class="rsvp-option" onclick="selectRSVP(this, 'أعتذر لظروف قهرية')">أعتذر لظروف قهرية</div>
     </div>
     
-    <textarea id="userMsg" placeholder="كلمة تهنئة لسيادة النقيب وعروسه..."></textarea>
-    <button onclick="sendInvite()" style="background: var(--dark-red); color: white; width: 100%; padding: 15px; border-radius: 30px; border: none; font-size: 1.1rem; cursor: pointer;">تأكيد الإرسال</button>
+    <textarea id="userMsg" rows="3" placeholder="كلمة تهنئة للعروسين..."></textarea>
+    <button class="btn-gold" onclick="sendInvite()">إرسال التهنة وتأكيد الحضور</button>
     
-    <div id="commentsList" style="margin-top: 30px;"></div>
+    <div id="commentsList" style="margin-top: 40px;"></div>
 </div>
 
 <div id="admin-panel">
-    <h2 style="color: var(--gold);">⚙️ إدارة بيانات الحفل</h2>
+    <h2 style="color: var(--royal-red)">لوحة التحكم يا سيادة النقيب</h2>
     <input type="datetime-local" id="targetDate">
-    <input type="text" id="imgUrl" placeholder="رابط صورة العروسين المباشر">
-    <button onclick="updateSettings()" style="background: green; color:white; padding: 15px;">حفظ التغييرات</button>
-    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background: #666; color:white; padding: 15px;">رجوع</button>
+    <input type="text" id="imgUrl" placeholder="رابط صورة العروسين">
+    <button onclick="updateSettings()" style="background: green; color:white; padding: 15px;">حفظ الإعدادات</button>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#333; color:white; padding:15px;">إغلاق</button>
     <hr>
     <div id="adminComments"></div>
 </div>
 
 <script>
-    // بياناتك المأخوذة من الصورة
+    // بياناتك
     const firebaseConfig = {
         apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
         authDomain: "engagmen.firebaseapp.com",
@@ -95,85 +114,75 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // تشغيل الأنظمة فوراً
     let tTime = 0;
-    let selectedRSVP = "";
+    let rsvpStatus = "";
 
-    function setRSVP(btn, val) {
-        document.querySelectorAll('.rsvp-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedRSVP = val;
+    function selectRSVP(el, val) {
+        document.querySelectorAll('.rsvp-option').forEach(opt => opt.classList.remove('active'));
+        el.classList.add('active');
+        rsvpStatus = val;
     }
 
-    // جلب الإعدادات (تعمل أوتوماتيك)
+    // جلب البيانات فوراً
     db.ref('settings').on('value', s => {
         const v = s.val();
         if(v) {
-            if(v.date) tTime = new Date(v.date).getTime();
-            if(v.image) { 
-                document.getElementById('mainImage').src = v.image;
-                document.getElementById('mainImage').style.display = 'block';
-            }
+            if(v.date) { tTime = new Date(v.date).getTime(); document.getElementById('targetDate').value = v.date; }
+            if(v.image) { document.getElementById('mainImage').src = v.image; document.getElementById('mainImage').style.display='block'; }
         }
     });
 
-    // العداد الزمني (يعمل أوتوماتيك)
+    // العداد التلقائي
     setInterval(() => {
         const diff = tTime - Date.now();
         if(diff <= 0) return;
-        document.getElementById('days').innerText = Math.floor(diff/(1000*60*60*24));
-        document.getElementById('hours').innerText = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-        document.getElementById('minutes').innerText = Math.floor((diff%(1000*60*60))/(1000*60));
-        document.getElementById('seconds').innerText = Math.floor((diff%(1000*60))/1000);
+        document.getElementById('days').innerText = String(Math.floor(diff/(1000*60*60*24))).padStart(2, '0');
+        document.getElementById('hours').innerText = String(Math.floor((diff%(1000*60*60*24))/(1000*60*60))).padStart(2, '0');
+        document.getElementById('minutes').innerText = String(Math.floor((diff%(1000*60*60))/(1000*60))).padStart(2, '0');
+        document.getElementById('seconds').innerText = String(Math.floor((diff%(1000*60))/1000)).padStart(2, '0');
     }, 1000);
 
-    // إرسال التعليق والحضور
     function sendInvite() {
         const n = document.getElementById('userName').value;
         const m = document.getElementById('userMsg').value;
-        if(n && selectedRSVP) {
-            db.ref('comments').push({ name: n, msg: m, status: selectedRSVP });
-            document.getElementById('userName').value = "";
-            document.getElementById('userMsg').value = "";
-            alert("تم تسجيل تشريفكم بنجاح ❤️");
+        if(n && rsvpStatus) {
+            db.ref('comments').push({ name: n, msg: m, status: rsvpStatus });
+            alert("تم إرسال تهنئتكم بنجاح!");
+            document.getElementById('userName').value = ""; document.getElementById('userMsg').value = "";
         } else { alert("يرجى كتابة الاسم واختيار حالة الحضور"); }
     }
 
-    // جلب التعليقات (تعمل أوتوماتيك)
     db.ref('comments').on('value', s => {
         const list = document.getElementById('commentsList');
         const adm = document.getElementById('adminComments');
-        list.innerHTML = ''; adm.innerHTML = '<h3>كشف الحضور:</h3>';
+        list.innerHTML = ''; adm.innerHTML = '<h3>قائمة الحضور:</h3>';
         s.forEach(c => {
-            const data = c.val();
-            list.innerHTML += `<div style="background:#fff; padding:15px; border-radius:15px; margin:10px 0; border-right:4px solid var(--gold);">
-                <b>${data.name}</b>: ${data.msg} <br> <small style="color:var(--gold)">الحالة: ${data.status}</small></div>`;
+            const d = c.val();
+            list.innerHTML += `<div style="border-bottom:1px solid #eee; padding:15px 0;">
+                <b style="color:var(--royal-red)">${d.name}</b>: ${d.msg} <br> <small style="color:var(--gold)">${d.status}</small></div>`;
             adm.innerHTML += `<div style="padding:10px; border-bottom:1px solid #ddd;">
-                <button onclick="db.ref('comments/${c.key}').remove()" style="background:red; color:white;">حذف</button> 
-                ${data.name} - ${data.status}</div>`;
+                <button onclick="db.ref('comments/${c.key}').remove()" style="background:red; color:white;">حذف</button> ${d.name}</div>`;
         });
     });
 
-    // نظام الأدمن المخفي
     let clicks = 0;
     function adminAuth() { clicks++; if(clicks>=10) { document.getElementById('admin-panel').style.display='block'; clicks=0; } }
 
     function updateSettings() {
         const d = document.getElementById('targetDate').value;
         const i = document.getElementById('imgUrl').value;
-        db.ref('settings').update({ date: d, image: i }).then(() => alert("تم الحفظ يا سيادة النقيب"));
+        db.ref('settings').update({ date: d, image: i }).then(() => alert("تم تحديث البيانات"));
     }
 
-    // أنيميشن الورد
+    // تساقط الورد
     setInterval(() => {
-        const rose = document.createElement('div');
-        rose.classList.add('floating-rose');
-        rose.innerHTML = '🌸';
-        rose.style.left = Math.random() * 100 + 'vw';
-        rose.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        document.body.appendChild(rose);
-        setTimeout(() => rose.remove(), 4000);
-    }, 600);
+        const f = document.createElement('div');
+        f.className = 'flower'; f.innerHTML = '🌸';
+        f.style.left = Math.random() * 100 + 'vw';
+        f.style.animationDuration = (Math.random() * 2 + 3) + 's';
+        document.body.appendChild(f);
+        setTimeout(() => f.remove(), 5000);
+    }, 800);
 </script>
 </body>
 </html>
