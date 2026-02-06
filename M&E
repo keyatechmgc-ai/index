@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تطبيق الخطوبة - نسخة الإصلاح الشامل</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        :root { --main: #ff4d6d; }
+        body { font-family: sans-serif; background: #fff0f3; text-align: center; color: #590d22; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        .countdown { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .box { background: #fff; padding: 10px; border-radius: 10px; border: 1px solid var(--main); min-width: 50px; }
+        input, textarea { width: 90%; padding: 10px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; }
+        button { background: var(--main); color: white; border: none; padding: 12px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; width: 100%; margin: 5px 0; }
+        #admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .comment-item { background: #f9f9f9; padding: 10px; margin: 5px 0; border-radius: 8px; border-right: 4px solid var(--main); text-align: right; }
+        .couple-img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; display: none; margin: 10px auto; border: 3px solid var(--main); }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <img id="mainImage" src="" class="couple-img">
+    <h2>💍 خطوبتنا السعيدة</h2>
+    <div class="countdown">
+        <div class="box"><span id="days">0</span><br>يوم</div>
+        <div class="box"><span id="hours">0</span><br>ساعة</div>
+        <div class="box"><span id="minutes">0</span><br>دقيقة</div>
+        <div class="box" onclick="adminAuth()" style="cursor:pointer"><span id="seconds">0</span><br>ثانية</div>
+    </div>
+    <div style="text-align: right;">
+        <input type="text" id="userName" placeholder="اسمك">
+        <textarea id="userMsg" placeholder="تهنئتك..."></textarea>
+        <button onclick="sendComment()">إرسال ❤️</button>
+    </div>
+    <div id="commentsList"></div>
+</div>
+
+<div id="admin-panel">
+    <h3>⚙️ إعدادات التطبيق</h3>
+    <input type="datetime-local" id="targetDate">
+    <input type="text" id="imgUrl" placeholder="رابط الصورة المباشر">
+    <button onclick="testConnection()" style="background: orange;">1. اختبار الاتصال بفايربيز</button>
+    <button onclick="updateSettings()" style="background: green;">2. حفظ الإعدادات</button>
+    <button onclick="document.getElementById('admin-panel').style.display='none'" style="background: gray;">إغلاق</button>
+    <hr>
+    <div id="adminComments"></div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
+        authDomain: "engagmen.firebaseapp.com",
+        databaseURL: "https://engagmen-default-rtdb.firebaseio.com",
+        projectId: "engagmen",
+        storageBucket: "engagmen.firebasestorage.app",
+        messagingSenderId: "286100738965",
+        appId: "1:286100738965:web:3f5be0307dca5927e5dc9c"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let clicks = 0;
+    function adminAuth() { clicks++; if(clicks>=10) { document.getElementById('admin-panel').style.display='block'; clicks=0; } }
+
+    let tTime = 0;
+
+    // اختبار الاتصال (زر جديد للتشخيص)
+    function testConnection() {
+        db.ref('connection_test').set(Date.now())
+            .then(() => alert("اتصال فايربيز ناجح! جرب الآن الحفظ."))
+            .catch(e => alert("فشل الاتصال: " + e.message));
+    }
+
+    // جلب البيانات
+    db.ref('settings').on('value', s => {
+        const v = s.val();
+        if(v) {
+            if(v.date) { tTime = new Date(v.date).getTime(); document.getElementById('targetDate').value = v.date; }
+            if(v.image) { document.getElementById('mainImage').src = v.image; document.getElementById('mainImage').style.display='block'; }
+        }
+    });
+
+    // الحفظ (باستخدام تحديث وليس تعيين كلي لضمان الاستقرار)
+    function updateSettings() {
+        const d = document.getElementById('targetDate').value;
+        const i = document.getElementById('imgUrl').value;
+        if(!d) return alert("اختر التاريخ!");
+
+        db.ref('settings').update({ date: d, image: i })
+            .then(() => alert("تم الحفظ بنجاح!"))
+            .catch(e => alert("خطأ: " + e.message));
+    }
+
+    // العداد
+    setInterval(() => {
+        const diff = tTime - Date.now();
+        if(diff <= 0) return;
+        document.getElementById('days').innerText = Math.floor(diff/(1000*60*60*24));
+        document.getElementById('hours').innerText = Math.floor((diff%(1000*60*60*24))/(1000*60*60));
+        document.getElementById('minutes').innerText = Math.floor((diff%(1000*60*60))/(1000*60));
+        document.getElementById('seconds').innerText = Math.floor((diff%(1000*60))/1000);
+    }, 1000);
+
+    // التعليقات
+    function sendComment() {
+        const n = document.getElementById('userName').value;
+        const m = document.getElementById('userMsg').value;
+        if(n && m) db.ref('comments').push({ name: n, msg: m });
+    }
+
+    db.ref('comments').on('value', s => {
+        const list = document.getElementById('commentsList');
+        const adm = document.getElementById('adminComments');
+        list.innerHTML = ''; adm.innerHTML = '';
+        s.forEach(c => {
+            list.innerHTML += `<div class="comment-item"><b>${c.val().name}:</b> ${c.val().msg}</div>`;
+            adm.innerHTML += `<div class="comment-item"><button onclick="db.ref('comments/${c.key}').remove()">حذف</button> ${c.val().name}</div>`;
+        });
+    });
+</script>
+</body>
+</html>
