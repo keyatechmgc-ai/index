@@ -34,13 +34,17 @@
         input, select, textarea { width: 100%; padding: 16px; margin: 12px 0; border-radius: 15px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; background: #fafafa; text-align: center; font-size: 1rem; }
         .btn-main { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 18px; width: 100%; border-radius: 18px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 8px 25px rgba(255, 133, 162, 0.4); margin-top: 15px; }
 
-        /* Modal */
+        /* تصفية التعليقات */
+        .filter-tabs { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+        .filter-btn { padding: 8px 18px; border-radius: 20px; border: 1.5px solid #eee; background: white; font-size: 13px; cursor: pointer; transition: 0.3s; color: #888; font-weight: bold; }
+        .filter-btn.active { background: var(--pink); color: white; border-color: var(--pink); }
+
+        .comment-item { background: #fff; padding: 15px; border-radius: 20px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 10px; text-align: right; box-shadow: 0 4px 10px rgba(0,0,0,0.02); animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
         .modal-content { background: white; padding: 40px; border-radius: 35px; text-align: center; max-width: 400px; width: 100%; border: 4px solid var(--gold); }
 
-        .comment-item { background: #fff; padding: 15px; border-radius: 20px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 10px; text-align: right; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-
-        /* Admin Panel Styling */
         #admin-panel { display: none; position: fixed; inset: 0; background: #fdfdfd; z-index: 99999; padding: 20px; overflow-y: auto; }
         .admin-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 5px solid var(--gold); }
         .stat-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -94,44 +98,42 @@
         <textarea id="inMsg" rows="2" placeholder="كلمة تهنئة..."></textarea>
         <button onclick="send()" class="btn-main">إرسال التهنئة</button>
         
-        <div id="feed" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;"></div>
+        <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 25px;">
+            <div class="filter-tabs">
+                <button class="filter-btn active" onclick="filterComments('all', this)">الكل</button>
+                <button class="filter-btn" onclick="filterComments('عريس', this)">عريس</button>
+                <button class="filter-btn" onclick="filterComments('عروسة', this)">عروسة</button>
+            </div>
+            <div id="feed"></div>
+        </div>
     </div>
 </div>
 
 <div id="admin-panel">
     <div style="max-width: 500px; margin: auto;">
         <h2 style="text-align: center; color: var(--pink);">إدارة الدعوة ⚙️</h2>
-        
         <div class="stat-box">
             <div class="stat-item">إجمالي<b id="sAll">0</b></div>
             <div class="stat-item" style="background:var(--gold)">حاضرون<b id="sYes">0</b></div>
             <div class="stat-item" style="background:#333">العريس<b id="sArr">0</b></div>
             <div class="stat-item" style="background:#888">العروسة<b id="sAro">0</b></div>
         </div>
-
         <div class="admin-card">
             <h3>تعديل البيانات 📝</h3>
             <input type="text" id="aImg" placeholder="رابط صورة العروسين">
             <input type="text" id="aHall" placeholder="اسم القاعة">
-            <input type="text" id="aDay" placeholder="اليوم (مثلاً: الجمعة)">
-            <input type="text" id="aTime" placeholder="الساعة (مثلاً: 7 مساءً)">
+            <input type="text" id="aDay" placeholder="اليوم">
+            <input type="text" id="aTime" placeholder="الساعة">
             <input type="text" id="aLoc" placeholder="رابط جوجل ماب">
-            <label style="font-size: 12px; color: #888;">تاريخ العداد التنازلي:</label>
             <input type="datetime-local" id="aDate">
             <button onclick="saveSettings()" class="btn-main" style="background: green;">حفظ التغييرات</button>
         </div>
-
-        <div class="admin-card">
-            <h3>قائمة المهنئين 📋</h3>
-            <div id="aList"></div>
-        </div>
-
-        <button onclick="document.getElementById('admin-panel').style.display='none'" class="btn-main" style="background: #666;">إغلاق اللوحة</button>
+        <div id="aList" class="admin-card"></div>
+        <button onclick="document.getElementById('admin-panel').style.display='none'" class="btn-main" style="background: #666;">إغلاق</button>
     </div>
 </div>
 
 <script>
-    // Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
         authDomain: "engagmen.firebaseapp.com",
@@ -143,7 +145,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let selectedSide = ""; let target = 0;
+    let selectedSide = ""; let target = 0; let allComments = [];
 
     function setSide(side, el) {
         document.querySelectorAll('.opt-text').forEach(b => b.classList.remove('active'));
@@ -151,7 +153,6 @@
         selectedSide = side;
     }
 
-    // جلب الإعدادات
     db.ref('settings').on('value', s => {
         const v = s.val() || {};
         if(v.date) target = new Date(v.date).getTime();
@@ -160,8 +161,6 @@
         document.getElementById('txtTime').innerText = v.time || "";
         document.getElementById('lnkLoc').href = v.loc || "#";
         if(v.img) { document.getElementById('headImg').src = v.img; document.getElementById('headImg').style.display='block'; }
-        
-        // تعبئة حقول الأدمن تلقائياً
         document.getElementById('aImg').value = v.img || "";
         document.getElementById('aHall').value = v.hall || "";
         document.getElementById('aDay').value = v.day || "";
@@ -170,7 +169,6 @@
         document.getElementById('aDate').value = v.date || "";
     });
 
-    // حفظ الإعدادات
     function saveSettings() {
         db.ref('settings').set({
             img: document.getElementById('aImg').value,
@@ -179,10 +177,9 @@
             time: document.getElementById('aTime').value,
             loc: document.getElementById('aLoc').value,
             date: document.getElementById('aDate').value
-        }).then(() => alert("تم حفظ البيانات بنجاح ✅"));
+        }).then(() => alert("تم حفظ البيانات ✅"));
     }
 
-    // العداد التنازلي
     setInterval(() => {
         const diff = target - Date.now();
         if(diff <= 0) return;
@@ -192,7 +189,6 @@
         document.getElementById('s').innerText = Math.floor((diff%(1000*60))/1000);
     }, 1000);
 
-    // إرسال البيانات
     function send() {
         const n = document.getElementById('inName').value;
         if(!n || !selectedSide) return alert("من فضلك اكتب اسمك واختار (عريس أو عروسة)");
@@ -204,36 +200,58 @@
         });
     }
 
-    // جلب التعليقات والإحصائيات
     db.ref('comments').on('value', snap => {
-        const feed = document.getElementById('feed'); const aList = document.getElementById('aList');
-        feed.innerHTML = ""; aList.innerHTML = "";
+        allComments = [];
         let c = { all:0, yes:0, g:0, b:0 };
+        const aList = document.getElementById('aList'); aList.innerHTML = "<h3>قائمة الحذف</h3>";
+        
         snap.forEach(child => {
-            const d = child.val(); c.all++;
+            const d = child.val(); d.id = child.key;
+            allComments.push(d);
+            c.all++;
             if(d.status === 'حاضر') c.yes++;
             if(d.side === 'عريس') c.g++; else c.b++;
-            
-            feed.innerHTML += `<div class="comment-item">
-                <div style="background:var(--pink); color:white; padding:5px 10px; border-radius:10px; font-size:10px; margin-left:10px;">${d.side}</div>
-                <div style="flex:1"><b>${d.name}</b> <small>(${d.status})</small><br><span style="font-size:12px; color:#666">${d.msg}</span></div>
-            </div>`;
 
-            aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:10px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:13px;">${d.name} (${d.side})</span>
-                <button onclick="db.ref('comments/${child.key}').remove()" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>
+            aList.innerHTML += `<div style="border-bottom:1px solid #eee; padding:8px; display:flex; justify-content:space-between;">
+                <span>${d.name}</span>
+                <button onclick="db.ref('comments/${d.id}').remove()" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>
             </div>`;
         });
+        
         document.getElementById('sAll').innerText = c.all;
         document.getElementById('sYes').innerText = c.yes;
         document.getElementById('sArr').innerText = c.g;
         document.getElementById('sAro').innerText = c.b;
+        
+        renderComments('all');
     });
 
-    // فتح لوحة التحكم بـ 10 ضغطات على الثواني
+    function filterComments(type, btn) {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderComments(type);
+    }
+
+    function renderComments(filter) {
+        const feed = document.getElementById('feed');
+        feed.innerHTML = "";
+        const filtered = filter === 'all' ? allComments : allComments.filter(c => c.side === filter);
+        
+        if(filtered.length === 0) {
+            feed.innerHTML = `<p style="color:#999; font-size:14px; margin-top:20px;">لا يوجد تهاني لهذا القسم بعد</p>`;
+            return;
+        }
+
+        filtered.forEach(d => {
+            feed.innerHTML += `<div class="comment-item">
+                <div style="background:var(--gold); color:white; padding:4px 10px; border-radius:10px; font-size:10px; margin-left:10px;">${d.side}</div>
+                <div style="flex:1"><b>${d.name}</b> <small style="color:var(--pink)">(${d.status})</small><br><span style="font-size:12px; color:#666">${d.msg}</span></div>
+            </div>`;
+        });
+    }
+
     let clk = 0; function adminCheck() { clk++; if(clk>=10) { document.getElementById('admin-panel').style.display='block'; clk=0; } }
 
-    // انيميشن القلوب
     setInterval(() => {
         const h = document.createElement('div'); h.className='heart'; h.innerHTML='❤️';
         h.style.left = Math.random()*100+'vw'; h.style.animationDuration = (Math.random()*3+2)+'s';
