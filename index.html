@@ -3,122 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M & E | Wedding</title>
+    <title>M & E | Wedding Invite</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Cinzel:wght@700&family=Amiri:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --gold: #c5a059; --pink: #ff85a2; --dark: #2d0a13; --bg: #fffafb; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--dark); overflow-x: hidden; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: var(--dark); overflow-x: hidden; }
 
-        /* قلوب متساقطة */
         .heart { position: fixed; top: -10%; z-index: 999; pointer-events: none; animation: fall linear forwards; color: var(--pink); font-size: 20px; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
 
-        .header { width: 100%; max-width: 500px; background: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--gold); border-radius: 0 0 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .main-names { font-family: 'Cinzel', serif; font-size: 2.8rem; color: var(--pink); margin: 0; letter-spacing: 3px; }
-        .couple-img { width: 140px; height: 140px; border-radius: 50%; border: 3px double var(--gold); object-fit: cover; margin: 15px auto; display: none; }
+        .header { width: 100%; max-width: 500px; background: white; padding: 40px 20px; text-align: center; border-bottom: 5px solid var(--gold); border-radius: 0 0 50px 50px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .main-names { font-family: 'Cinzel', serif; font-size: 3rem; color: var(--pink); margin: 0; letter-spacing: 4px; }
+        .couple-img { width: 150px; height: 150px; border-radius: 50%; border: 4px double var(--gold); object-fit: cover; margin: 20px auto; display: none; }
 
-        .timer-wrap { display: flex; justify-content: center; gap: 8px; margin-top: -30px; width: 90%; max-width: 400px; z-index: 10; }
-        .t-card { background: white; flex: 1; padding: 10px 5px; border-radius: 12px; box-shadow: 0 8px 15px rgba(0,0,0,0.08); border-bottom: 3px solid var(--pink); display: flex; flex-direction: column; align-items: center; }
-        .t-card b { font-size: 1.3rem; color: var(--pink); }
-        .t-card span { font-size: 0.65rem; color: #888; font-weight: bold; }
+        .timer-wrap { display: flex; justify-content: center; gap: 8px; margin-top: -30px; width: 90%; max-width: 400px; }
+        .t-card { background: white; flex: 1; padding: 12px 5px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-bottom: 3px solid var(--pink); display: flex; flex-direction: column; align-items: center; }
+        .t-card b { font-size: 1.4rem; color: var(--pink); }
+        .t-card span { font-size: 0.7rem; color: #888; font-weight: bold; }
 
-        .container { width: 92%; max-width: 450px; margin: 40px auto; display: flex; flex-direction: column; align-items: center; }
-        .card { background: white; padding: 25px 15px; border-radius: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.03); border: 1px solid rgba(197, 160, 89, 0.1); text-align: center; width: 100%; }
+        .container { width: 92%; max-width: 450px; margin: 50px auto; display: flex; flex-direction: column; align-items: center; }
+        .card { background: white; padding: 30px 20px; border-radius: 35px; box-shadow: 0 15px 45px rgba(0,0,0,0.04); border: 1px solid rgba(197, 160, 89, 0.1); text-align: center; width: 100%; }
+
+        /* منطقة الاختيار الجديدة */
+        .selection-box { display: flex; gap: 15px; margin: 25px 0; justify-content: center; }
+        .opt-box { flex: 1; padding: 20px 10px; border: 2px solid #f0f0f0; border-radius: 20px; cursor: pointer; transition: 0.3s; background: #fff; position: relative; }
+        .opt-box img { width: 65px; height: 65px; margin-bottom: 10px; }
+        .opt-box b { display: block; font-size: 1.1rem; color: #777; }
         
-        /* اختيار الطرف بالأيقونات المضمونة */
-        .side-selection { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
-        .side-option { flex: 1; background: #fff; border: 2px solid #f0f0f0; border-radius: 20px; padding: 15px 5px; cursor: pointer; transition: 0.3s; }
-        .side-img-wrap { width: 70px; height: 70px; margin: 0 auto 10px; border-radius: 50%; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border: 1px solid #eee; overflow: hidden; }
-        .side-option img { width: 100%; height: 100%; object-fit: cover; }
-        .side-option span { display: block; font-weight: bold; font-size: 13px; color: #888; }
-        
-        .side-option.active { border-color: var(--gold); background: #fffdf5; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(197, 160, 89, 0.2); }
-        .side-option.active span { color: var(--gold); }
+        .opt-box.active { border-color: var(--gold); background: #fffdf5; transform: scale(1.05); }
+        .opt-box.active b { color: var(--gold); }
+        .opt-box.active::after { content: '✔'; position: absolute; top: 10px; left: 10px; color: var(--gold); font-weight: bold; }
 
-        input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; background: #fdfdfd; font-size: 14px; text-align: center; }
-        .btn-main { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 133, 162, 0.3); margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1.5px solid #eee; font-family: 'Cairo'; outline: none; background: #fdfdfd; text-align: center; font-size: 1rem; }
+        .btn-main { background: linear-gradient(135deg, var(--pink), #ff5e84); color: white; border: none; padding: 18px; width: 100%; border-radius: 15px; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 6px 20px rgba(255, 133, 162, 0.4); margin-top: 15px; }
 
-        /* نافذة النجاح (المودال) */
-        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: white; padding: 30px 20px; border-radius: 25px; text-align: center; max-width: 350px; width: 100%; border: 3px solid var(--gold); }
+        /* نافذة النجاح (المودال الرايق) */
+        .custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 10000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: white; padding: 40px 20px; border-radius: 30px; text-align: center; max-width: 380px; width: 100%; border: 4px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
 
-        .comment-item { background: #fffcfd; padding: 12px; border-radius: 15px; margin-bottom: 10px; border-right: 4px solid var(--pink); display: flex; align-items: center; gap: 12px; text-align: right; }
-        .side-icon-small { font-size: 22px; width: 40px; height: 40px; border-radius: 50%; background: #fff0f3; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .comment-item { background: #fffcfd; padding: 15px; border-radius: 20px; margin-bottom: 12px; border-right: 5px solid var(--pink); display: flex; align-items: center; gap: 15px; text-align: right; width: 100%; }
+        .side-avatar { font-size: 26px; background: #fff0f3; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-        #admin-panel { display: none; position: fixed; inset: 0; background: #fff; z-index: 9999; padding: 20px; overflow-y: auto; }
-        .stat-card { background: #f9f9f9; padding: 10px; border-radius: 10px; margin-bottom: 10px; border-left: 4px solid var(--gold); text-align: right; }
+        #admin-panel { display: none; position: fixed; inset: 0; background: white; z-index: 9999; padding: 25px; overflow-y: auto; text-align: center; }
     </style>
 </head>
 <body>
 
 <div id="successModal" class="custom-modal">
     <div class="modal-content">
-        <div style="font-size: 50px;">💐</div>
-        <h2 style="color: var(--pink); margin: 10px 0;">شرفتنا ونورتنا!</h2>
-        <p id="successText" style="color: #666; font-size: 14px; margin-bottom: 20px;"></p>
-        <button onclick="location.reload()" class="btn-main">تم</button>
+        <div style="font-size: 70px; margin-bottom: 15px;">💖</div>
+        <h2 style="color: var(--pink); margin: 0;">شكراً لتهنئتك!</h2>
+        <p id="successText" style="color: #555; font-size: 1.1rem; margin: 15px 0 25px; line-height: 1.6;"></p>
+        <button onclick="location.reload()" class="btn-main">نراكم على خير</button>
     </div>
 </div>
 
 <div class="header">
     <h1 class="main-names">M & E</h1>
     <img id="headImg" class="couple-img">
-    <div style="font-family: 'Amiri', serif; margin-top: 10px;">
-        <span id="txtHall" style="font-size: 1.5rem; color: var(--gold);">...</span><br>
-        <div style="font-size: 0.9rem; color: #555;">📅 <span id="txtDay">...</span> | 🕒 <span id="txtTime">...</span></div>
-        <a id="lnkLoc" href="#" target="_blank" style="color:#4285F4; text-decoration:none; font-size: 12px; font-weight:bold;">📍 الخريطة</a>
+    <div style="font-family: 'Amiri', serif; margin-top: 15px;">
+        <span id="txtHall" style="font-size: 1.8rem; color: var(--gold);">...</span><br>
+        📅 <span id="txtDay">...</span> | 🕒 <span id="txtTime">...</span>
+        <a id="lnkLoc" href="#" target="_blank" style="display:block; margin-top:10px; color:#4285F4; text-decoration:none; font-size: 14px; font-weight:bold;">📍 الخريطة</a>
     </div>
 </div>
 
 <div class="timer-wrap">
-    <div class="t-card"><b id="d">00</b><span>أيام</span></div>
-    <div class="t-card"><b id="h">00</b><span>ساعات</span></div>
-    <div class="t-card"><b id="m">00</b><span>دقائق</span></div>
-    <div class="t-card" onclick="adminCheck()"><b id="s">00</b><span>ثواني</span></div>
+    <div class="t-card"><b id="d">00</b><span>يوم</span></div>
+    <div class="t-card"><b id="h">00</b><span>ساعة</span></div>
+    <div class="t-card"><b id="m">00</b><span>دقيقة</span></div>
+    <div class="t-card" onclick="adminCheck()"><b id="s">00</b><span>ثانية</span></div>
 </div>
 
 <div class="container">
     <div class="card">
-        <h3 style="margin-top:0">ننتظركم بكل حب ❤️</h3>
-        <input type="text" id="inName" placeholder="اكتب اسمك الكريم">
+        <h3 style="color: var(--gold); margin-top: 0;">ننتظركم لتكتمل فرحتنا ❤️</h3>
+        <input type="text" id="inName" placeholder="الاسم الكريم">
         
-        <div class="side-selection">
-            <div class="side-option" onclick="selectSide('العريس', this)">
-                <div class="side-img-wrap">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3663/3663361.png" alt="العريس">
-                </div>
-                <span>طرف العريس</span>
+        <div class="selection-box">
+            <div class="opt-box" onclick="setSide('عريس', this)">
+                <img src="https://cdn-icons-png.flaticon.com/512/3663/3663361.png" alt="العريس">
+                <b>عريس</b>
             </div>
-            <div class="side-option" onclick="selectSide('العروسة', this)">
-                <div class="side-img-wrap">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3663/3663335.png" alt="العروسة">
-                </div>
-                <span>طرف العروسة</span>
+            <div class="opt-box" onclick="setSide('عروسة', this)">
+                <img src="https://cdn-icons-png.flaticon.com/512/3663/3663335.png" alt="العروسة">
+                <b>عروسة</b>
             </div>
         </div>
 
         <select id="inStatus">
             <option value="حاضر">بإذن الله سأحضر</option>
-            <option value="يحاول">سأحاول الحضور</option>
-            <option value="معتذر">أعتذر لظروف</option>
+            <option value="يحاول">سأبذل جهدي للتشريف</option>
+            <option value="معتذر">أعتذر لظروف قهرية</option>
         </select>
-        <textarea id="inMsg" rows="2" placeholder="كلمة تهنئة..."></textarea>
+        <textarea id="inMsg" rows="3" placeholder="كلمة تهنئة للعروسين..."></textarea>
         <button onclick="send()" class="btn-main">إرسال التهنئة</button>
         
-        <div id="feed" style="margin-top: 25px;"></div>
+        <div id="feed" style="margin-top: 35px; border-top: 1px solid #eee; padding-top: 25px;"></div>
     </div>
 </div>
 
 <div id="admin-panel">
-    <h2 style="color: var(--pink); text-align: center;">إدارة الدعوة ⚙️</h2>
-    <div id="stats" style="margin-bottom:20px;">
-        <div class="stat-card">إجمالي المهنئين: <b id="sAll">0</b></div>
-        <div class="stat-card">طرف العريس: <b id="sArr">0</b></div>
-        <div class="stat-card">طرف العروسة: <b id="sAro">0</b></div>
-    </div>
+    <h2 style="color: var(--pink);">لوحة الإدارة ⚙️</h2>
     <div id="aList"></div>
     <button onclick="document.getElementById('admin-panel').style.display='none'" class="btn-main" style="background:#666;">إغلاق</button>
 </div>
@@ -137,8 +126,8 @@
     const db = firebase.database();
     let selectedSide = ""; let target = 0;
 
-    function selectSide(side, el) {
-        document.querySelectorAll('.side-option').forEach(opt => opt.classList.remove('active'));
+    function setSide(side, el) {
+        document.querySelectorAll('.opt-box').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
         selectedSide = side;
     }
@@ -146,7 +135,7 @@
     db.ref('settings').on('value', s => {
         const v = s.val() || {};
         if(v.date) target = new Date(v.date).getTime();
-        document.getElementById('txtHall').innerText = v.hall || "فرحتنا";
+        document.getElementById('txtHall').innerText = v.hall || "فرحتنا الكبيرة";
         document.getElementById('txtDay').innerText = v.day || "";
         document.getElementById('txtTime').innerText = v.time || "";
         document.getElementById('lnkLoc').href = v.loc || "#";
@@ -164,33 +153,25 @@
 
     function send() {
         const n = document.getElementById('inName').value;
-        if(!n || !selectedSide) return alert("من فضلك اكتب اسمك واختر الطرف");
+        if(!n || !selectedSide) return alert("من فضلك اكتب اسمك واختار (عريس أو عروسة)");
         db.ref('comments').push({
             name: n, side: selectedSide, status: document.getElementById('inStatus').value, msg: document.getElementById('inMsg').value
         }).then(() => {
-            document.getElementById('successText').innerText = `يا ${n}، تهنئتك وصلت للعروسين بنجاح.. نراك على خير! ❤️`;
+            document.getElementById('successText').innerText = `يا ${n}، نورتنا وشرفتنا بتهنئتك.. ننتظرك بكل حب في موعدنا المحدد! ❤️`;
             document.getElementById('successModal').style.display = 'flex';
         });
     }
 
     db.ref('comments').on('value', snap => {
-        const feed = document.getElementById('feed'); const aList = document.getElementById('aList');
-        feed.innerHTML = ""; aList.innerHTML = "";
-        let c = { all:0, g:0, b:0 };
+        const feed = document.getElementById('feed');
+        feed.innerHTML = "";
         snap.forEach(child => {
-            const d = child.val(); c.all++;
-            if(d.side === 'العريس') c.g++; else c.b++;
+            const d = child.val();
             feed.innerHTML += `<div class="comment-item">
-                <div class="side-icon-small">${d.side === 'العريس' ? '🤵' : '👰'}</div>
-                <div><b>${d.name}</b> <small style="color:var(--pink)">(${d.status})</small><br><span style="font-size:12px;color:#666">${d.msg}</span></div>
+                <div class="side-avatar">${d.side === 'عريس' ? '🤵' : '👰'}</div>
+                <div style="flex:1"><b>${d.name}</b> <small style="color:var(--gold)">(${d.status})</small><br><span style="font-size:13px;color:#666">${d.msg}</span></div>
             </div>`;
-            aList.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee; font-size:13px;">
-                <button onclick="db.ref('comments/${child.key}').remove()" style="float:left; color:red; border:none; background:none;">حذف</button>
-                ${d.name} (${d.side})</div>`;
         });
-        document.getElementById('sAll').innerText = c.all;
-        document.getElementById('sArr').innerText = c.g;
-        document.getElementById('sAro').innerText = c.b;
     });
 
     let clk = 0; function adminCheck() { clk++; if(clk>=10) { document.getElementById('admin-panel').style.display='block'; clk=0; } }
