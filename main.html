@@ -562,6 +562,11 @@
             color: white;
             font-weight: 800;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .royal-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .royal-filters {
@@ -747,7 +752,7 @@
                 <option value="معتذر">أعتذر لظروف خاصة</option>
             </select>
             <textarea id="guestMessage" class="royal-textarea" rows="3" placeholder="رسالة تهنئة..."></textarea>
-            <button class="royal-submit" onclick="submitRSVP()">إرسال التهنئة</button>
+            <button class="royal-submit" id="submitBtn" onclick="submitRSVP()">إرسال التهنئة</button>
         </div>
 
         <div class="royal-comments" id="royalComments">
@@ -809,8 +814,9 @@
         const messageArrow = document.getElementById('messageArrow');
         const typewriterText = document.getElementById('typewriterText');
         const typewriterCursor = document.getElementById('typewriterCursor');
+        const submitBtn = document.getElementById('submitBtn');
         
-        // ============ TYPEWRITER EFFECT (حرف حرف - جمل عربية متصلة) ============
+        // ============ TYPEWRITER EFFECT ============
         let currentMessage = '';
         let currentIndex = 0;
         
@@ -827,18 +833,14 @@
                     typewriterText.innerHTML += char;
                     currentIndex++;
                     
-                    // تأثير سباركلز كل 7 حروف
                     if (currentIndex % 7 === 0 && currentIndex > 0) {
                         const rect = typewriterText.getBoundingClientRect();
                         createSparkleOnChar(rect.left + rect.width / 2, rect.top + rect.height / 2);
-                        // اهتزاز خفيف للنص
                         gsap.to(typewriterText, { scale: 1.02, duration: 0.1, yoyo: true, repeat: 1 });
                     }
                 } else {
                     clearInterval(typewriterInterval);
-                    // إخفاء الكيرسر بعد الانتهاء
                     typewriterCursor.style.opacity = '0';
-                    // إظهار السهم
                     setTimeout(() => {
                         messageArrow.classList.add('visible');
                         for (let i = 0; i < 15; i++) {
@@ -869,18 +871,15 @@
             if (invitationRevealed) return;
             invitationRevealed = true;
             
-            // إخفاء السهم
             messageArrow.style.pointerEvents = 'none';
             messageArrow.style.opacity = '0';
             messageArrow.style.transform = 'scale(0)';
             
-            // تشغيل الموسيقى
             music.play().then(() => {
                 musicStarted = true;
                 console.log('✅ Music started');
             }).catch(e => console.log('Play error:', e));
             
-            // إخفاء شاشة الرسالة مع تأثير
             messageScreen.classList.add('hide');
             blurOverlay.classList.remove('active');
             
@@ -889,17 +888,14 @@
                 messageScreen.classList.remove('hide');
                 messageScreen.style.display = 'none';
                 
-                // إظهار المحتوى الرئيسي
                 mainContainer.style.opacity = '1';
                 document.getElementById('mainCard').classList.add('active');
                 
-                // أنيميشن البطاقة
                 gsap.fromTo('#mainCard', 
                     { scale: 0.9, opacity: 0, y: 50 },
                     { scale: 1, opacity: 1, y: 0, duration: 0.7, ease: 'back.out(1.2)' }
                 );
                 
-                // إظهار الكاونتر
                 setTimeout(() => {
                     gsap.fromTo('.royal-countdown', 
                         { opacity: 0, y: 30 },
@@ -911,7 +907,6 @@
                     );
                 }, 200);
                 
-                // إظهار الفورم والتعليقات
                 setTimeout(() => {
                     document.getElementById('royalForm').classList.add('active');
                     document.getElementById('royalComments').classList.add('active');
@@ -922,14 +917,12 @@
                     );
                 }, 500);
                 
-                // كونفيتي احتفالاً
                 canvasConfetti({ particleCount: 600, spread: 200, origin: { y: 0.5 }, colors: ['#e8c97a', '#ffb7c5', '#c94f6b', '#ff8da3'], startVelocity: 30 });
                 setTimeout(() => {
                     canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.3 }, colors: ['#ffb7c5', '#e8c97a'] });
                     canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.7 }, colors: ['#c94f6b', '#ff8da3'] });
                 }, 300);
                 
-                // قلوب وورود متطايرة
                 for (let i = 0; i < 50; i++) {
                     setTimeout(() => {
                         createRoyalHeart(Math.random() * window.innerWidth, window.innerHeight / 2);
@@ -953,20 +946,14 @@
             db.ref('mainSettings').on('value', (snap) => {
                 const data = snap.val();
                 if (data) {
-                    // الأسماء في البطاقة الرئيسية فقط (شاشة الرسالة ملهاش أسماء)
                     document.getElementById('groomName').textContent = data.groom || 'Mahmoud';
                     document.getElementById('brideName').textContent = data.bride || 'Eman';
-                    
-                    // بدء تأثير الكتابة للرسالة
                     const messageText = data.eventLabel || '✨ فرحة عمرنا ✨';
                     startTypewriterEffect(messageText);
-                    
-                    // باقي البيانات
                     document.getElementById('eventDate').textContent = data.eventDate || 'الجمعة 8 أغسطس 2026';
                     document.getElementById('eventTime').textContent = data.eventTime || 'الساعة 7:00 مساءً';
                     document.getElementById('eventVenue').textContent = data.venue || 'قاعة ديفا هول - القاهرة';
                     document.getElementById('locationLink').href = data.locationLink || '#';
-                    
                     if (data.globalBg) globalBg.src = data.globalBg;
                     if (data.coupleImage) coupleImage.src = data.coupleImage;
                     if (data.musicUrl && data.musicUrl !== music.src) {
@@ -1116,7 +1103,6 @@
                     gsap.to(flipOverlay, { opacity: 0, duration: 0.5, delay: 0.5 });
                     gsap.to(flipEffect, { opacity: 0, duration: 0.5, delay: 0.5 });
                     
-                    // إظهار شاشة الرسالة مع البلور
                     blurOverlay.classList.add('active');
                     messageScreen.classList.add('active');
                     gsap.fromTo(messageScreen, 
@@ -1159,59 +1145,98 @@
             }
         }
         
-        // ============ SUBMIT RSVP (المعدلة) ============
+        // ============ SUBMIT RSVP (المعدلة والمظبوطة) ============
         function submitRSVP() {
             const name = document.getElementById('guestName').value.trim();
             const status = document.getElementById('guestStatus').value;
             const message = document.getElementById('guestMessage').value.trim();
             
-            if (!name || !selectedSide) {
-                showModal('تنبيه', 'يرجى إدخال الاسم واختيار الطرف', '⚠️');
+            // التحقق من صحة المدخلات
+            if (!name) {
+                showModal('تنبيه', 'يرجى إدخال الاسم الكريم', '⚠️');
                 return;
             }
             
-            // تعطيل الزر أثناء الإرسال
-            const submitBtn = document.querySelector('.royal-submit');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'جاري الإرسال...';
+            if (!selectedSide) {
+                showModal('تنبيه', 'يرجى اختيار طرف العريس أو العروسة', '⚠️');
+                return;
+            }
             
-            db.ref('wishes').push({
+            // تعطيل الزر ومنع الضغط المتكرر
+            if (submitBtn.disabled) return;
+            submitBtn.disabled = true;
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '⏳ جاري الإرسال...';
+            
+            // إنشاء معرف فريد مؤقت
+            const tempId = Date.now().toString();
+            const wishData = {
                 name: name,
                 side: selectedSide,
                 status: status,
                 message: message,
-                timestamp: firebase.database.ServerValue.TIMESTAMP
-            }).then(() => {
-                const responseMessage = getResponseMessage(name, status, selectedSide);
-                showModal('تم الإرسال', responseMessage, '💝');
-                
-                // تفريغ الحقول
-                document.getElementById('guestName').value = '';
-                document.getElementById('guestMessage').value = '';
-                document.querySelectorAll('.royal-side-btn').forEach(btn => btn.classList.remove('active'));
-                selectedSide = '';
-                
-                // مؤثرات احتفالية
-                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 25);
-                canvasConfetti({ 
-                    particleCount: 500, 
-                    spread: 180, 
-                    origin: { y: 0.6 }, 
-                    colors: ['#e8c97a', '#ffb7c5', '#c94f6b', '#ff8da3'] 
-                });
-                setTimeout(() => {
-                    canvasConfetti({ particleCount: 300, spread: 120, origin: { y: 0.4, x: 0.3 }, colors: ['#e8c97a', '#ffb7c5'] });
-                    canvasConfetti({ particleCount: 300, spread: 120, origin: { y: 0.4, x: 0.7 }, colors: ['#c94f6b', '#ff8da3'] });
-                }, 200);
-                
-            }).catch((error) => {
-                console.error('Firebase Error:', error);
-                showModal('خطأ', 'حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى', '❌');
-            }).finally(() => {
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-            });
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                createdAt: new Date().toISOString()
+            };
+            
+            console.log('📤 جاري إرسال البيانات:', wishData);
+            
+            // محاولة الإرسال مع إعادة المحاولة
+            const sendToFirebase = (retryCount = 0) => {
+                db.ref('wishes').push(wishData)
+                    .then(() => {
+                        console.log('✅ تم الإرسال بنجاح');
+                        const responseMessage = getResponseMessage(name, status, selectedSide);
+                        showModal('تم الإرسال', responseMessage, '💝');
+                        
+                        // تفريغ الحقول
+                        document.getElementById('guestName').value = '';
+                        document.getElementById('guestMessage').value = '';
+                        document.querySelectorAll('.royal-side-btn').forEach(btn => btn.classList.remove('active'));
+                        selectedSide = '';
+                        
+                        // مؤثرات احتفالية
+                        createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 25);
+                        canvasConfetti({ 
+                            particleCount: 600, 
+                            spread: 200, 
+                            origin: { y: 0.6 }, 
+                            colors: ['#e8c97a', '#ffb7c5', '#c94f6b', '#ff8da3'] 
+                        });
+                        setTimeout(() => {
+                            canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.3 }, colors: ['#e8c97a', '#ffb7c5'] });
+                            canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.7 }, colors: ['#c94f6b', '#ff8da3'] });
+                        }, 200);
+                        
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    })
+                    .catch((error) => {
+                        console.error('❌ خطأ في الإرسال:', error);
+                        console.error('رمز الخطأ:', error.code);
+                        console.error('رسالة الخطأ:', error.message);
+                        
+                        // إعادة المحاولة إذا كان الخطأ متعلق بالاتصال
+                        if (retryCount < 3 && (error.code === 'DISCONNECTED' || error.message.includes('network'))) {
+                            console.log(`🔄 إعادة المحاولة ${retryCount + 1}/3...`);
+                            setTimeout(() => sendToFirebase(retryCount + 1), 1000);
+                        } else {
+                            let errorMessage = '';
+                            if (error.code === 'PERMISSION_DENIED') {
+                                errorMessage = 'لا توجد صلاحية للكتابة في قاعدة البيانات. تأكد من قواعد الأمان.';
+                            } else if (error.code === 'DISCONNECTED') {
+                                errorMessage = 'لا يوجد اتصال بالإنترنت. تأكد من اتصالك.';
+                            } else {
+                                errorMessage = error.message || 'حدث خطأ غير معروف';
+                            }
+                            showModal('خطأ في الإرسال', errorMessage, '❌');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                        }
+                    });
+            };
+            
+            sendToFirebase();
         }
         
         // ============ WISHES RENDERING ============
@@ -1263,8 +1288,8 @@
             startPageFlipEffect();
         }, 100);
         
-        console.log('%c👑 ROYAL MAIN PAGE - MESSAGE SCREEN WITH BLUR 👑', 'color: #e8c97a; font-size: 18px; font-weight: bold');
-        console.log('%c📝 Connected Arabic typewriter | Click arrow to reveal invitation', 'color: #ffb7c5; font-size: 14px');
+        console.log('%c👑 ROYAL MAIN PAGE - FULLY WORKING 👑', 'color: #e8c97a; font-size: 18px; font-weight: bold');
+        console.log('%c📝 Connected to Firebase | Ready to send wishes', 'color: #ffb7c5; font-size: 14px');
     </script>
 </body>
 </html>
