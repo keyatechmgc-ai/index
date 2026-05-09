@@ -604,6 +604,67 @@
 </head>
 <body>
 
+    <!-- ============ الصوت أول حاجة في الكود ============ -->
+    <!-- عنصر الصوت المخفي -->
+    <audio id="bgMusic" preload="auto" loop style="position:fixed;top:-100px;left:-100px;width:1px;height:1px;opacity:0;pointer-events:none;">
+        <source src="https://res.cloudinary.com/dsuv6suzb/video/upload/v1/wedding-audio/adkhly_omry_complete" type="audio/mpeg">
+    </audio>
+    
+    <!-- تشغيل الصوت فوراً باستخدام iframe trick -->
+    <iframe id="musicIframe" style="position:fixed;top:-100px;left:-100px;width:1px;height:1px;opacity:0;pointer-events:none;" allow="autoplay"></iframe>
+    
+    <script>
+        // ============ تشغيل الصوت فوراً (أول 0.1 ثانية) ============
+        (function() {
+            // طريقة 1: محاولة تشغيل الصوت مباشرة
+            const music = document.getElementById('bgMusic');
+            music.volume = 0.7;
+            music.load();
+            
+            // محاولة تشغيل فورية
+            const playPromise = music.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('✅ Music started instantly!');
+                }).catch(e => {
+                    console.log('Direct play blocked, trying alternative...');
+                    // طريقة 2: استخدام iframe مخفي
+                    const iframe = document.getElementById('musicIframe');
+                    iframe.srcdoc = `
+                        <!DOCTYPE html>
+                        <html>
+                        <body>
+                            <audio autoplay loop>
+                                <source src="https://res.cloudinary.com/dsuv6suzb/video/upload/v1/wedding-audio/adkhly_omry_complete" type="audio/mpeg">
+                            </audio>
+                            <script>
+                                document.querySelector('audio').play();
+                            <\/script>
+                        </body>
+                        </html>
+                    `;
+                });
+            }
+            
+            // طريقة 3: أول ضغطة من المستخدم (نسخة احتياطية)
+            const playOnFirstTouch = () => {
+                music.play().catch(() => {});
+                document.body.removeEventListener('click', playOnFirstTouch);
+                document.body.removeEventListener('touchstart', playOnFirstTouch);
+            };
+            document.body.addEventListener('click', playOnFirstTouch);
+            document.body.addEventListener('touchstart', playOnFirstTouch);
+            
+            // الريبيت التلقائي
+            music.addEventListener('ended', () => {
+                music.currentTime = 0;
+                music.play().catch(() => {});
+            });
+        })();
+    </script>
+    
+    <!-- ============ باقي التصميم ============ -->
+
     <!-- خلفية -->
     <div class="royal-bg">
         <img class="royal-bg-image" id="globalBgImage" src="https://i.pinimg.com/736x/47/aa/57/47aa57cabff46306447e777ac52e8a8e.jpg" alt="">
@@ -773,29 +834,7 @@
         </div>
     </div>
 
-    <!-- صوت -->
-    <audio id="bgMusic" preload="auto" loop crossorigin="anonymous" autoplay>
-        <source src="https://res.cloudinary.com/dsuv6suzb/video/upload/v1/wedding-audio/adkhly_omry_complete" type="audio/mpeg">
-    </audio>
-
     <script>
-        // ============ تشغيل الصوت فوراً ============
-        (function playAudioImmediately() {
-            const musicElement = document.getElementById('bgMusic');
-            musicElement.volume = 0.7;
-            
-            // محاولة التشغيل فوراً
-            musicElement.play().then(() => {
-                console.log('✅ Music started immediately');
-            }).catch(e => {
-                console.log('⚠️ Auto-play blocked, will retry:', e);
-                // محاولة مرة ثانية بعد 100ms
-                setTimeout(() => {
-                    musicElement.play().catch(() => {});
-                }, 100);
-            });
-        })();
-
         // ============ FIREBASE ============
         const firebaseConfig = {
             apiKey: "AIzaSyCF-kh6JgAbhroue7cKRdMZjwYV8m2c6Uw",
@@ -827,33 +866,7 @@
         const mainContainer = document.getElementById('mainContainer');
         const music = document.getElementById('bgMusic');
         
-        // ============ MUSIC FUNCTIONS (محسن للتشغيل الفوري) ============
-        let musicStarted = true; // Changed to true because we started already
-        let musicPlayAttempts = 0;
-
-        function forcePlayMusic() {
-            if (musicStarted) return;
-            
-            music.play().then(() => {
-                musicStarted = true;
-                console.log('✅ Music started successfully');
-                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 8);
-            }).catch(e => {
-                console.log('⏳ Waiting for user interaction...', e);
-                musicPlayAttempts++;
-                if (musicPlayAttempts < 5) {
-                    setTimeout(forcePlayMusic, 500);
-                }
-            });
-        }
-
-        // الريبيت التلقائي
-        music.addEventListener('ended', () => {
-            music.currentTime = 0;
-            music.play().catch(e => console.log('Loop play error:', e));
-        });
-        
-        // ============ UPLOAD MUSIC ============
+        // ============ MUSIC UPLOAD FUNCTIONS ============
         function uploadMusic() {
             cloudinary.openUploadWidget({ 
                 cloudName: CLOUD_NAME, 
@@ -923,21 +936,21 @@
         }
         
         // ============ AI PARTICLES ============
-        const canvasEl = document.getElementById('royalParticlesCanvas');
-        const ctxEl = canvasEl.getContext('2d');
+        const canvas = document.getElementById('royalParticlesCanvas');
+        const ctx = canvas.getContext('2d');
         let particles = [];
         
         function resizeCanvas() {
-            canvasEl.width = window.innerWidth;
-            canvasEl.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         
         for (let i = 0; i < 180; i++) {
             particles.push({
-                x: Math.random() * canvasEl.width,
-                y: Math.random() * canvasEl.height,
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
                 size: Math.random() * 5 + 1,
                 speedX: (Math.random() - 0.5) * 0.35,
                 speedY: (Math.random() - 0.5) * 0.25,
@@ -947,19 +960,19 @@
         }
         
         function animateParticles() {
-            ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
                 p.x += p.speedX + Math.sin(p.phase) * 0.06;
                 p.y += p.speedY + Math.cos(p.phase) * 0.04;
                 p.phase += 0.012;
-                if (p.x < -50) p.x = canvasEl.width + 50;
-                if (p.x > canvasEl.width + 50) p.x = -50;
-                if (p.y < -50) p.y = canvasEl.height + 50;
-                if (p.y > canvasEl.height + 50) p.y = -50;
-                ctxEl.beginPath();
-                ctxEl.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctxEl.fillStyle = p.color;
-                ctxEl.fill();
+                if (p.x < -50) p.x = canvas.width + 50;
+                if (p.x > canvas.width + 50) p.x = -50;
+                if (p.y < -50) p.y = canvas.height + 50;
+                if (p.y > canvas.height + 50) p.y = -50;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
             });
             requestAnimationFrame(animateParticles);
         }
@@ -1348,7 +1361,7 @@
         }, 100);
         
         console.log('%c👑 ROYAL INVITATION SYSTEM ACTIVATED 👑', 'color: #e8c97a; font-size: 22px; font-weight: bold;');
-        console.log('%c🎵 Music: فوري + ريبيت تلقائي | 🎨 AI Effects: Active', 'color: #ffb7c5; font-size: 14px;');
+        console.log('%c🎵 Music: INSTANT PLAY (first thing in code) | 🎨 AI Effects: Active', 'color: #ffb7c5; font-size: 14px;');
         console.log('%c⚙️ Admin Panel: 10 clicks on SECONDS box', 'color: #ff8da3; font-size: 12px;');
     </script>
 </body>
