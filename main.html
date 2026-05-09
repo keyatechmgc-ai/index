@@ -244,14 +244,8 @@
             max-width: 500px;
             width: 100%;
         }
-        .message-screen-title {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.5rem;
-            color: var(--pink-dark);
-            margin-bottom: 30px;
-        }
-        /* نوع الرايتر المحسن */
-        .typewriter-message {
+        /* مؤشر الكتابة */
+        .typewriter-container {
             font-family: 'Cairo', sans-serif;
             font-size: 1.6rem;
             color: var(--pink-royal);
@@ -259,14 +253,10 @@
             text-align: center;
             direction: rtl;
             min-height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
+            position: relative;
         }
-        .typewriter-message span {
-            display: inline-block;
+        .typewriter-text {
+            display: inline;
         }
         .typewriter-cursor {
             display: inline-block;
@@ -665,11 +655,10 @@
             .royal-count-item { padding: 12px 5px; border-radius: 22px; }
             .royal-count-number { font-size: 1.5rem; }
             .royal-count-label { font-size: 0.5rem; letter-spacing: 2px; }
-            .typewriter-message { font-size: 1.2rem; }
+            .typewriter-container { font-size: 1.2rem; }
             .typewriter-cursor { height: 1.4rem; }
             .arrow-circle { width: 65px; height: 65px; }
             .arrow-circle svg { width: 32px; height: 32px; }
-            .message-screen-title { font-size: 2rem; }
         }
     </style>
 </head>
@@ -700,8 +689,10 @@
     <!-- شاشة الرسالة -->
     <div class="message-screen" id="messageScreen">
         <div class="message-screen-content">
-            <div class="message-screen-title" id="messageTitle"></div>
-            <div class="typewriter-message" id="typewriterMessage"></div>
+            <div class="typewriter-container" id="typewriterContainer">
+                <span class="typewriter-text" id="typewriterText"></span>
+                <span class="typewriter-cursor" id="typewriterCursor"></span>
+            </div>
             <div class="message-arrow" id="messageArrow" onclick="revealInvitationDetails()">
                 <div class="arrow-circle">
                     <svg viewBox="0 0 24 24" stroke="white" stroke-width="2" fill="none">
@@ -816,52 +807,37 @@
         const messageScreen = document.getElementById('messageScreen');
         const blurOverlay = document.getElementById('blurOverlay');
         const messageArrow = document.getElementById('messageArrow');
-        const typewriterContainer = document.getElementById('typewriterMessage');
+        const typewriterText = document.getElementById('typewriterText');
+        const typewriterCursor = document.getElementById('typewriterCursor');
         
-        // ============ TYPEWRITER EFFECT (حرف حرف) ============
-        let currentText = '';
+        // ============ TYPEWRITER EFFECT (حرف حرف - جمل عربية متصلة) ============
+        let currentMessage = '';
         let currentIndex = 0;
         
         function startTypewriterEffect(message) {
-            typewriterContainer.innerHTML = '';
-            currentText = message;
+            typewriterText.innerHTML = '';
+            currentMessage = message;
             currentIndex = 0;
             
             if (typewriterInterval) clearInterval(typewriterInterval);
             
-            // إظهار الكيرسر
-            const cursorSpan = document.createElement('span');
-            cursorSpan.className = 'typewriter-cursor';
-            typewriterContainer.appendChild(cursorSpan);
-            
             typewriterInterval = setInterval(() => {
-                if (currentIndex < currentText.length) {
-                    const char = currentText[currentIndex];
-                    const charSpan = document.createElement('span');
-                    charSpan.textContent = char;
-                    charSpan.style.opacity = '0';
-                    charSpan.style.transform = 'scale(0)';
-                    typewriterContainer.insertBefore(charSpan, cursorSpan);
-                    
-                    // تأثير ظهور الحرف
-                    gsap.to(charSpan, {
-                        opacity: 1,
-                        scale: 1,
-                        duration: 0.1,
-                        ease: 'back.out(1.2)',
-                        onComplete: () => {
-                            if (currentIndex % 5 === 0 && currentIndex > 0) {
-                                const rect = charSpan.getBoundingClientRect();
-                                createSparkleOnChar(rect.left + rect.width / 2, rect.top + rect.height / 2);
-                            }
-                        }
-                    });
-                    
+                if (currentIndex < currentMessage.length) {
+                    const char = currentMessage[currentIndex];
+                    typewriterText.innerHTML += char;
                     currentIndex++;
+                    
+                    // تأثير سباركلز كل 7 حروف
+                    if (currentIndex % 7 === 0 && currentIndex > 0) {
+                        const rect = typewriterText.getBoundingClientRect();
+                        createSparkleOnChar(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        // اهتزاز خفيف للنص
+                        gsap.to(typewriterText, { scale: 1.02, duration: 0.1, yoyo: true, repeat: 1 });
+                    }
                 } else {
                     clearInterval(typewriterInterval);
                     // إخفاء الكيرسر بعد الانتهاء
-                    cursorSpan.style.opacity = '0';
+                    typewriterCursor.style.opacity = '0';
                     // إظهار السهم
                     setTimeout(() => {
                         messageArrow.classList.add('visible');
@@ -874,15 +850,15 @@
                         }
                     }, 300);
                 }
-            }, 70);
+            }, 80);
         }
         
         function createSparkleOnChar(x, y) {
-            for (let i = 0; i < 2; i++) {
+            for (let i = 0; i < 3; i++) {
                 const s = document.createElement('div');
                 s.className = 'royal-sparkle';
                 s.innerHTML = ['✨', '⭐', '🌟', '💫'][Math.floor(Math.random() * 4)];
-                s.style.cssText = `left: ${x + (Math.random() - 0.5) * 30}px; top: ${y + (Math.random() - 0.5) * 20}px; font-size: ${Math.random() * 14 + 8}px; --dur: ${Math.random() * 0.8 + 0.6}s;`;
+                s.style.cssText = `left: ${x + (Math.random() - 0.5) * 40}px; top: ${y + (Math.random() - 0.5) * 30}px; font-size: ${Math.random() * 14 + 8}px; --dur: ${Math.random() * 0.8 + 0.6}s;`;
                 document.body.appendChild(s);
                 setTimeout(() => s.remove(), 1200);
             }
@@ -977,12 +953,11 @@
             db.ref('mainSettings').on('value', (snap) => {
                 const data = snap.val();
                 if (data) {
-                    // الأسماء
+                    // الأسماء في البطاقة الرئيسية فقط (شاشة الرسالة ملهاش أسماء)
                     document.getElementById('groomName').textContent = data.groom || 'Mahmoud';
                     document.getElementById('brideName').textContent = data.bride || 'Eman';
-                    document.getElementById('messageTitle').textContent = `${data.groom || 'Mahmoud'} & ${data.bride || 'Eman'}`;
                     
-                    // بدء تأثير الكتابة
+                    // بدء تأثير الكتابة للرسالة
                     const messageText = data.eventLabel || '✨ فرحة عمرنا ✨';
                     startTypewriterEffect(messageText);
                     
@@ -1007,7 +982,6 @@
                     }
                 } else {
                     startTypewriterEffect('✨ فرحة عمرنا ✨');
-                    document.getElementById('messageTitle').textContent = 'Mahmoud & Eman';
                 }
             });
             
@@ -1259,8 +1233,8 @@
             startPageFlipEffect();
         }, 100);
         
-        console.log('%c👑 ROYAL MAIN PAGE - MESSAGE SCREEN WITH BLUR 👑', 'color: #e8c97a; font-size: 18px; font-weight: bold;');
-        console.log('%c📝 Typewriter effect | Click arrow to reveal invitation', 'color: #ffb7c5; font-size: 14px;');
+        console.log('%c👑 ROYAL MAIN PAGE - MESSAGE SCREEN WITH BLUR 👑', 'color: #e8c97a; font-size: 18px; font-weight: bold');
+        console.log('%c📝 Connected Arabic typewriter | Click arrow to reveal invitation', 'color: #ffb7c5; font-size: 14px');
     </script>
 </body>
 </html>
