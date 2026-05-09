@@ -54,7 +54,7 @@
             position: relative;
         }
 
-        /* خلفية ملكية - إضاءة مناسبة */
+        /* خلفية */
         .royal-bg {
             position: fixed;
             inset: 0;
@@ -90,13 +90,13 @@
             100% { transform: translate(100px, 100px); }
         }
 
-        /* كيرسر ملكي */
+        /* كيرسر */
         .royal-cursor {
             position: fixed;
             width: 500px;
             height: 500px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,183,197,0.1) 0%, rgba(255,141,163,0.05) 40%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,183,197,0.12) 0%, rgba(255,141,163,0.06) 40%, transparent 70%);
             pointer-events: none;
             z-index: 9998;
             transform: translate(-50%, -50%);
@@ -105,7 +105,7 @@
         }
         .royal-cursor.active { opacity: 1; }
 
-        /* قلوب ملكية */
+        /* قلوب */
         .royal-heart {
             position: fixed;
             pointer-events: none;
@@ -120,24 +120,11 @@
             100% { transform: translateY(-15vh) translateX(var(--dxe)) scale(0.2) rotate(calc(var(--rot) + 180deg)); opacity: 0; }
         }
 
-        /* سباركلز */
-        .royal-sparkle {
-            position: fixed;
-            pointer-events: none;
-            z-index: 9996;
-            animation: royalSparkleAnim var(--dur) ease-out forwards;
-        }
-        @keyframes royalSparkleAnim {
-            0% { transform: scale(0) rotate(0deg); opacity: 0; }
-            25% { transform: scale(1.5) rotate(90deg); opacity: 1; }
-            100% { transform: scale(0) rotate(270deg); opacity: 0; }
-        }
-
-        /* ورد متطاير */
+        /* ورد */
         .royal-flower {
             position: fixed;
             pointer-events: none;
-            z-index: 9995;
+            z-index: 9996;
             animation: royalFlowerFloat var(--dur) ease-out forwards;
         }
         @keyframes royalFlowerFloat {
@@ -147,7 +134,20 @@
             100% { transform: translateY(-20vh) translateX(var(--dxe)) scale(0) rotate(calc(var(--rot) + 360deg)); opacity: 0; }
         }
 
-        /* كانفاس جسيمات */
+        /* سباركلز */
+        .royal-sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9995;
+            animation: royalSparkleAnim var(--dur) ease-out forwards;
+        }
+        @keyframes royalSparkleAnim {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            25% { transform: scale(1.5) rotate(90deg); opacity: 1; }
+            100% { transform: scale(0) rotate(270deg); opacity: 0; }
+        }
+
+        /* كانفاس */
         #royalParticlesCanvas {
             position: fixed;
             inset: 0;
@@ -156,35 +156,49 @@
             opacity: 0.5;
         }
 
-        /* تأثير الورقة الملكي */
-        .royal-page-effect {
+        /* تأثير انقلاب الصفحة */
+        .page-flip-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.8) 100%);
+            background: radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.85) 100%);
             z-index: 10000;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        .royal-page-effect.active {
-            opacity: 1;
-            animation: pageFlipReveal 1.5s ease forwards;
+        .flip-effect {
+            position: fixed;
+            inset: 0;
+            z-index: 10001;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
         }
-        @keyframes pageFlipReveal {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.2); }
+        .flip-card {
+            width: 300px;
+            height: 400px;
+            background: linear-gradient(145deg, #fff9f7, #fff);
+            border-radius: 20px;
+            box-shadow: 0 0 100px rgba(232,201,122,0.5);
+            transform-style: preserve-3d;
         }
 
-        /* الحاوية الرئيسية */
+        /* حاوية رئيسية */
         .royal-container {
             position: relative;
             z-index: 10;
             max-width: 580px;
             margin: 0 auto;
             padding: 30px 20px 80px;
+            opacity: 0;
+        }
+        .royal-container.visible {
+            opacity: 1;
         }
 
-        /* البطاقة الملكية */
+        /* بطاقة */
         .royal-card {
             background: linear-gradient(145deg, rgba(255,255,255,0.96) 0%, rgba(255,249,247,0.92) 100%);
             backdrop-filter: blur(20px);
@@ -194,11 +208,8 @@
             box-shadow: var(--shadow-royal), 0 0 0 2px rgba(255,255,255,0.3), 0 0 0 6px rgba(232,201,122,0.2);
             position: relative;
             overflow: hidden;
-            transform: translateY(0);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* إطار الصورة */
         .royal-frame {
             width: 160px;
             height: 160px;
@@ -206,8 +217,11 @@
             border-radius: 50%;
             padding: 6px;
             background: var(--gradient-royal);
-            animation: frameRoyalPulse 3s ease-in-out infinite;
-            position: relative;
+            animation: framePulse 3s ease-in-out infinite;
+        }
+        @keyframes framePulse {
+            0%,100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(232,201,122,0.4); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 20px rgba(232,201,122,0); }
         }
         .royal-frame img {
             width: 100%;
@@ -217,11 +231,7 @@
             border: 4px solid var(--white);
         }
 
-        /* الأسماء - خط Great Vibes */
-        .royal-names {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        .royal-names { text-align: center; margin-bottom: 20px; }
         .royal-groom, .royal-bride {
             font-family: 'Great Vibes', cursive;
             font-size: 3.5rem;
@@ -230,7 +240,6 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            letter-spacing: 4px;
         }
         .royal-and {
             display: block;
@@ -240,7 +249,6 @@
             margin: 5px 0;
         }
 
-        /* البادج */
         .royal-badge {
             display: inline-block;
             padding: 10px 32px;
@@ -250,25 +258,26 @@
             font-size: 0.75rem;
             letter-spacing: 5px;
             font-weight: 800;
-            text-transform: uppercase;
             margin: 20px auto;
         }
 
-        /* التفاصيل - بدون ايموجي جنب النص */
+        /* تفاصيل - تحت بعض */
         .royal-details {
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 16px;
             margin-top: 25px;
         }
         .royal-detail {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            width: 100%;
+            max-width: 280px;
             gap: 15px;
             color: var(--dark);
             font-size: 1rem;
-            font-weight: 500;
             padding: 8px 16px;
             background: rgba(255,255,255,0.5);
             border-radius: 50px;
@@ -283,8 +292,11 @@
             justify-content: center;
             font-size: 1.2rem;
         }
+        .royal-detail-text {
+            flex: 1;
+            text-align: right;
+        }
 
-        /* رابط الدعوة */
         .royal-invite-link {
             display: inline-flex;
             align-items: center;
@@ -298,7 +310,7 @@
             font-weight: 700;
         }
 
-        /* الكاونتر */
+        /* كاونتر */
         .royal-countdown {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -334,7 +346,7 @@
             margin-top: 8px;
         }
 
-        /* الفورم */
+        /* فورم */
         .royal-form, .royal-comments {
             background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(255,249,247,0.92));
             backdrop-filter: blur(20px);
@@ -397,7 +409,7 @@
             cursor: pointer;
         }
 
-        /* الفلاتر */
+        /* فلاتر */
         .royal-filters {
             display: flex;
             gap: 10px;
@@ -419,7 +431,7 @@
             color: #2a1a1f;
         }
 
-        /* التعليقات */
+        /* تعليقات */
         .royal-comments-list {
             max-height: 450px;
             overflow-y: auto;
@@ -441,36 +453,12 @@
             font-weight: 800;
             margin-bottom: 10px;
         }
-        .royal-comment-name {
-            font-weight: 800;
-            color: var(--pink-dark);
-            margin-left: 12px;
-        }
-        .royal-comment-status {
-            font-size: 0.7rem;
-            color: var(--gold-dark);
-            margin-right: 10px;
-        }
-        .royal-comment-message {
-            color: #555;
-            font-size: 0.9rem;
-            margin-top: 10px;
-        }
-        .royal-comment-delete {
-            float: left;
-            background: none;
-            border: none;
-            color: #c94f6b;
-            cursor: pointer;
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            border-radius: 20px;
-        }
-        .royal-comment-delete:hover {
-            background: rgba(201,79,107,0.1);
-        }
+        .royal-comment-name { font-weight: 800; color: var(--pink-dark); margin-left: 12px; }
+        .royal-comment-status { font-size: 0.7rem; color: var(--gold-dark); margin-right: 10px; }
+        .royal-comment-message { color: #555; font-size: 0.9rem; margin-top: 10px; }
+        .royal-comment-delete { float: left; background: none; border: none; color: #c94f6b; cursor: pointer; padding: 5px 10px; border-radius: 20px; }
 
-        /* لوحة التحكم */
+        /* لوحة تحكم */
         .royal-admin {
             position: fixed;
             inset: 0;
@@ -483,38 +471,21 @@
             align-items: center;
             justify-content: center;
         }
-        .royal-admin.active {
-            display: flex;
-        }
+        .royal-admin.active { display: flex; }
         .royal-admin-card {
             background: linear-gradient(145deg, #1a0e12, #2a1a1f);
             border-radius: 60px;
             padding: 45px 35px;
-            max-width: 650px;
+            max-width: 700px;
             width: 100%;
             border: 1px solid rgba(232,201,122,0.3);
             max-height: 90vh;
             overflow-y: auto;
         }
-        .royal-admin-card::-webkit-scrollbar {
-            width: 5px;
-        }
-        .royal-admin-card::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 10px;
-        }
-        .royal-admin-title {
-            color: var(--gold);
-            font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .royal-admin-label {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.7rem;
-            display: block;
-            margin-bottom: 5px;
-        }
+        .royal-admin-card::-webkit-scrollbar { width: 5px; }
+        .royal-admin-card::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        .royal-admin-title { color: var(--gold); font-size: 1.8rem; text-align: center; margin-bottom: 30px; }
+        .royal-admin-label { color: rgba(255,255,255,0.6); font-size: 0.7rem; display: block; margin-bottom: 5px; }
         .royal-admin-input {
             width: 100%;
             padding: 14px 18px;
@@ -534,14 +505,8 @@
             cursor: pointer;
             margin-bottom: 12px;
         }
-        .royal-admin-btn-primary {
-            background: linear-gradient(135deg, #e8c97a, #c9a84c);
-            color: #1a0e12;
-        }
-        .royal-admin-btn-danger {
-            background: linear-gradient(135deg, #c94f6b, #a8324b);
-            color: white;
-        }
+        .royal-admin-btn-primary { background: linear-gradient(135deg, #e8c97a, #c9a84c); color: #1a0e12; }
+        .royal-admin-btn-danger { background: linear-gradient(135deg, #c94f6b, #a8324b); color: white; }
 
         /* إحصائيات */
         .royal-stats-grid {
@@ -556,23 +521,17 @@
             padding: 15px;
             text-align: center;
         }
-        .royal-stat-number {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--gold);
-            display: block;
-        }
-        .royal-stat-label {
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.7);
-        }
-        .royal-filter-btns {
+        .royal-stat-number { font-size: 1.8rem; font-weight: 800; color: var(--gold); display: block; }
+        .royal-stat-label { font-size: 0.6rem; color: rgba(255,255,255,0.7); }
+
+        /* فلاتر لوحة التحكم */
+        .admin-filter-btns {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
-        .royal-filter-admin {
+        .admin-filter-btn {
             padding: 6px 12px;
             background: rgba(255,255,255,0.1);
             border: none;
@@ -581,12 +540,17 @@
             font-size: 0.7rem;
             cursor: pointer;
         }
-        .royal-filter-admin.active {
-            background: var(--gradient-gold);
-            color: #1a0e12;
+        .admin-filter-btn.active { background: var(--gradient-gold); color: #1a0e12; }
+
+        /* كاونتر في الاعدادات */
+        .countdown-settings {
+            background: rgba(255,255,255,0.08);
+            border-radius: 30px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
-        /* المودال */
+        /* مودال */
         .royal-modal {
             position: fixed;
             inset: 0;
@@ -598,9 +562,7 @@
             justify-content: center;
             padding: 20px;
         }
-        .royal-modal.active {
-            display: flex;
-        }
+        .royal-modal.active { display: flex; }
         .royal-modal-content {
             background: linear-gradient(145deg, #fff, #fff9f7);
             border-radius: 70px;
@@ -610,13 +572,11 @@
             width: 100%;
         }
 
-        /* فوتر */
         .royal-footer {
             text-align: center;
             padding: 40px 20px;
             color: rgba(232,201,122,0.6);
             font-size: 0.7rem;
-            letter-spacing: 2px;
         }
 
         @media (max-width: 550px) {
@@ -624,6 +584,7 @@
             .royal-card { padding: 35px 20px 45px; }
             .royal-groom, .royal-bride { font-size: 2.5rem; }
             .royal-count-number { font-size: 2rem; }
+            .royal-detail { max-width: 100%; }
         }
     </style>
 </head>
@@ -639,14 +600,17 @@
     <!-- كيرسر -->
     <div class="royal-cursor" id="royalCursor"></div>
 
-    <!-- تأثير الورقة -->
-    <div class="royal-page-effect" id="pageEffect"></div>
+    <!-- تأثير انقلاب الصفحة -->
+    <div class="page-flip-overlay" id="flipOverlay"></div>
+    <div class="flip-effect" id="flipEffect">
+        <div class="flip-card" id="flipCard"></div>
+    </div>
 
     <!-- كانفاس -->
     <canvas id="royalParticlesCanvas"></canvas>
 
-    <!-- الحاوية -->
-    <div class="royal-container">
+    <!-- حاوية رئيسية -->
+    <div class="royal-container" id="mainContainer">
         <div class="royal-card" id="heroCard">
             <div class="royal-frame"><img id="coupleImage" src="https://via.placeholder.com/160" alt="Couple"></div>
             <div class="royal-names">
@@ -656,9 +620,9 @@
             </div>
             <div style="text-align: center;"><span class="royal-badge" id="eventLabel">We're Getting Married!</span></div>
             <div class="royal-details">
-                <div class="royal-detail"><span class="royal-detail-icon">📅</span><span id="eventDate">08 . 08 . 2026</span></div>
-                <div class="royal-detail"><span class="royal-detail-icon">🕖</span><span id="eventTime">7:00 PM</span></div>
-                <div class="royal-detail"><span class="royal-detail-icon">📍</span><span id="eventVenue">Diva Hall</span></div>
+                <div class="royal-detail"><span class="royal-detail-icon">📅</span><span class="royal-detail-text" id="eventDate">08 . 08 . 2026</span></div>
+                <div class="royal-detail"><span class="royal-detail-icon">🕖</span><span class="royal-detail-text" id="eventTime">7:00 PM</span></div>
+                <div class="royal-detail"><span class="royal-detail-icon">📍</span><span class="royal-detail-text" id="eventVenue">Diva Hall</span></div>
             </div>
             <div style="text-align: center;"><a href="#" id="locationLink" target="_blank" class="royal-invite-link">Formal Invitation</a></div>
         </div>
@@ -699,7 +663,7 @@
         <div class="royal-footer">جميع الحقوق محفوظة لنقابة تكنولوجيا المعلومات والبرمجيات المصرية 2026</div>
     </div>
 
-    <!-- لوحة التحكم -->
+    <!-- لوحة تحكم -->
     <div class="royal-admin" id="adminPanel">
         <div class="royal-admin-card">
             <div class="royal-admin-title">لوحة التحكم الملكية</div>
@@ -717,6 +681,17 @@
             
             <div style="height: 15px;"></div>
             
+            <!-- اعدادات الكاونتر -->
+            <div class="countdown-settings">
+                <label class="royal-admin-label">⚙️ إعدادات الكاونتر</label>
+                <label class="royal-admin-label">تاريخ المناسبة</label>
+                <input type="datetime-local" id="adminCountdownDate" class="royal-admin-input">
+                <button class="royal-admin-btn royal-admin-btn-primary" onclick="saveCountdownSettings()">حفظ تاريخ الكاونتر</button>
+            </div>
+            
+            <div style="height: 15px;"></div>
+            
+            <!-- إحصائيات -->
             <div class="royal-stats-grid">
                 <div class="royal-stat-card"><span class="royal-stat-number" id="statTotal">0</span><span class="royal-stat-label">إجمالي</span></div>
                 <div class="royal-stat-card"><span class="royal-stat-number" id="statPresent">0</span><span class="royal-stat-label">حاضرون</span></div>
@@ -726,22 +701,22 @@
                 <div class="royal-stat-card"><span class="royal-stat-number" id="statBride">0</span><span class="royal-stat-label">من العروسة</span></div>
             </div>
             
-            <div class="royal-filter-btns" id="adminFilterBtns">
-                <button class="royal-filter-admin active" onclick="filterAdmin('all', this)">الكل</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('حاضر', this)">حاضرون</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('ربما', this)">سيحاولون</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('معتذر', this)">معتذرون</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('عريس', this)">عريس</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('عروسة', this)">عروسة</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('حاضر_عريس', this)">حاضر + عريس</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('حاضر_عروسة', this)">حاضر + عروسة</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('ربما_عريس', this)">سيحاول + عريس</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('ربما_عروسة', this)">سيحاول + عروسة</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('معتذر_عريس', this)">معتذر + عريس</button>
-                <button class="royal-filter-admin" onclick="filterAdmin('معتذر_عروسة', this)">معتذر + عروسة</button>
+            <div class="admin-filter-btns" id="adminFilterBtns">
+                <button class="admin-filter-btn active" onclick="filterAdmin('all', this)">الكل</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('حاضر', this)">حاضرون</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('ربما', this)">سيحاولون</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('معتذر', this)">معتذرون</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('عريس', this)">عريس</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('عروسة', this)">عروسة</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('حاضر_عريس', this)">حاضر + عريس</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('حاضر_عروسة', this)">حاضر + عروسة</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('ربما_عريس', this)">سيحاول + عريس</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('ربما_عروسة', this)">سيحاول + عروسة</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('معتذر_عريس', this)">معتذر + عريس</button>
+                <button class="admin-filter-btn" onclick="filterAdmin('معتذر_عروسة', this)">معتذر + عروسة</button>
             </div>
             
-            <div class="royal-comments-list" id="adminCommentsList" style="max-height: 300px;"></div>
+            <div class="royal-comments-list" id="adminCommentsList" style="max-height: 250px;"></div>
             
             <div style="height: 15px;"></div>
             
@@ -775,8 +750,8 @@
         </div>
     </div>
 
-    <!-- عنصر الصوت -->
-    <audio id="bgMusic" loop preload="auto">
+    <!-- صوت -->
+    <audio id="bgMusic" preload="auto" loop>
         <source src="https://res.cloudinary.com/dsuv6suzb/video/upload/v1/wedding-audio/adkhly_omry_complete" type="audio/mpeg">
     </audio>
 
@@ -805,10 +780,15 @@
         let currentAdminFilter = 'all';
         let targetDate = new Date(2026, 7, 8, 19, 0, 0).getTime();
         let adminClicks = 0;
+        let musicStarted = false;
+        
+        // ============ ELEMENTS ============
+        const globalBg = document.getElementById('globalBgImage');
+        const coupleImage = document.getElementById('coupleImage');
+        const mainContainer = document.getElementById('mainContainer');
         
         // ============ MUSIC ============
-        let music = document.getElementById('bgMusic');
-        let musicStarted = false;
+        const music = document.getElementById('bgMusic');
         
         function startMusic() {
             if (!musicStarted) {
@@ -817,20 +797,54 @@
             }
         }
         
-        // بدء الموسيقى عند أول تفاعل
-        document.addEventListener('click', startMusic);
-        document.addEventListener('touchstart', startMusic);
-        
-        // ريبيت تلقائي
         music.addEventListener('ended', () => {
             music.currentTime = 0;
             music.play();
         });
-
-        // ============ ELEMENTS ============
-        const globalBg = document.getElementById('globalBgImage');
-        const coupleImage = document.getElementById('coupleImage');
-
+        
+        document.addEventListener('click', startMusic);
+        document.addEventListener('touchstart', startMusic);
+        
+        // ============ PAGE FLIP EFFECT ============
+        function startPageFlipEffect() {
+            const flipOverlay = document.getElementById('flipOverlay');
+            const flipEffect = document.getElementById('flipEffect');
+            const flipCard = document.getElementById('flipCard');
+            
+            flipOverlay.style.opacity = '1';
+            flipEffect.style.opacity = '1';
+            
+            // انيميشن الورقة
+            gsap.fromTo(flipCard, 
+                { rotationY: -180, scale: 0.5, opacity: 0 },
+                { rotationY: 0, scale: 1, opacity: 1, duration: 1.2, ease: 'back.out(1.5)', onComplete: () => {
+                    gsap.to(flipCard, { scale: 1.2, opacity: 0, duration: 0.5, delay: 0.3 });
+                    gsap.to(flipOverlay, { opacity: 0, duration: 0.5, delay: 0.5 });
+                    gsap.to(flipEffect, { opacity: 0, duration: 0.5, delay: 0.5 });
+                    gsap.to(mainContainer, { opacity: 1, duration: 0.8, delay: 0.3 });
+                }}
+            );
+            
+            // ورد وقلوب بكثافة
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    createRoyalFlower(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                    createRoyalHeart(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                    createRoyalSparkle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 2);
+                }, i * 40);
+            }
+            
+            // كونفيتي
+            canvasConfetti({ particleCount: 600, spread: 200, origin: { y: 0.5 }, colors: ['#ffb7c5', '#ff8da3', '#e8c97a', '#c94f6b'], startVelocity: 30 });
+            setTimeout(() => {
+                canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.3 }, colors: ['#ffb7c5', '#e8c97a'] });
+                canvasConfetti({ particleCount: 400, spread: 150, origin: { y: 0.4, x: 0.7 }, colors: ['#ff8da3', '#c94f6b'] });
+            }, 400);
+            setTimeout(() => {
+                canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.6 }, colors: ['#ffb7c5', '#e8c97a', '#ff8da3'] });
+            }, 800);
+        }
+        
         // ============ AI PARTICLES ============
         const canvas = document.getElementById('royalParticlesCanvas');
         const ctx = canvas.getContext('2d');
@@ -843,14 +857,14 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         
-        for (let i = 0; i < 150; i++) {
+        for (let i = 0; i < 180; i++) {
             particles.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 size: Math.random() * 5 + 1,
-                speedX: (Math.random() - 0.5) * 0.3,
-                speedY: (Math.random() - 0.5) * 0.2,
-                color: `rgba(${Math.random() > 0.5 ? '232,201,122' : '255,183,197'}, ${Math.random() * 0.3 + 0.1})`,
+                speedX: (Math.random() - 0.5) * 0.35,
+                speedY: (Math.random() - 0.5) * 0.25,
+                color: `rgba(${Math.random() > 0.5 ? '232,201,122' : '255,183,197'}, ${Math.random() * 0.35 + 0.1})`,
                 phase: Math.random() * Math.PI * 2
             });
         }
@@ -858,9 +872,9 @@
         function animateParticles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(p => {
-                p.x += p.speedX + Math.sin(p.phase) * 0.05;
-                p.y += p.speedY + Math.cos(p.phase) * 0.05;
-                p.phase += 0.01;
+                p.x += p.speedX + Math.sin(p.phase) * 0.06;
+                p.y += p.speedY + Math.cos(p.phase) * 0.04;
+                p.phase += 0.012;
                 if (p.x < -50) p.x = canvas.width + 50;
                 if (p.x > canvas.width + 50) p.x = -50;
                 if (p.y < -50) p.y = canvas.height + 50;
@@ -873,13 +887,13 @@
             requestAnimationFrame(animateParticles);
         }
         animateParticles();
-
-        // ============ AI HEARTS, FLOWERS, SPARKLES ============
+        
+        // ============ AI EFFECTS ============
         function createRoyalHeart(x, y) {
             const heart = document.createElement('div');
             heart.className = 'royal-heart';
             heart.innerHTML = ['❤️', '💖', '💗', '💕', '💘', '💝'][Math.floor(Math.random() * 6)];
-            heart.style.cssText = `left: ${x}px; font-size: ${Math.random() * 28 + 18}px; --dur: ${Math.random() * 5 + 4}s; --dx: ${(Math.random() - 0.5) * 180}px; --dxe: ${(Math.random() - 0.5) * 120}px; --rot: ${(Math.random() - 0.5) * 200}deg; --sc: ${Math.random() * 0.6 + 0.7};`;
+            heart.style.cssText = `left: ${x}px; font-size: ${Math.random() * 30 + 20}px; --dur: ${Math.random() * 5 + 4}s; --dx: ${(Math.random() - 0.5) * 200}px; --dxe: ${(Math.random() - 0.5) * 140}px; --rot: ${(Math.random() - 0.5) * 200}deg; --sc: ${Math.random() * 0.6 + 0.7};`;
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 9000);
         }
@@ -887,8 +901,8 @@
         function createRoyalFlower(x, y) {
             const flower = document.createElement('div');
             flower.className = 'royal-flower';
-            flower.innerHTML = ['🌸', '🌹', '💮', '🏵️', '🌺'][Math.floor(Math.random() * 5)];
-            flower.style.cssText = `left: ${x}px; font-size: ${Math.random() * 24 + 16}px; --dur: ${Math.random() * 5 + 4}s; --dx: ${(Math.random() - 0.5) * 150}px; --dxe: ${(Math.random() - 0.5) * 100}px; --rot: ${(Math.random() - 0.5) * 360}deg; --sc: ${Math.random() * 0.5 + 0.6};`;
+            flower.innerHTML = ['🌸', '🌹', '💮', '🏵️', '🌺', '🌼'][Math.floor(Math.random() * 6)];
+            flower.style.cssText = `left: ${x}px; font-size: ${Math.random() * 26 + 18}px; --dur: ${Math.random() * 5 + 4}s; --dx: ${(Math.random() - 0.5) * 170}px; --dxe: ${(Math.random() - 0.5) * 110}px; --rot: ${(Math.random() - 0.5) * 360}deg; --sc: ${Math.random() * 0.5 + 0.6};`;
             document.body.appendChild(flower);
             setTimeout(() => flower.remove(), 9000);
         }
@@ -897,79 +911,43 @@
             for (let i = 0; i < count; i++) {
                 const s = document.createElement('div');
                 s.className = 'royal-sparkle';
-                s.innerHTML = ['✨', '⭐', '🌟', '💫', '⚜️'][Math.floor(Math.random() * 5)];
-                s.style.cssText = `left: ${x + (Math.random() - 0.5) * 100}px; top: ${y + (Math.random() - 0.5) * 100}px; font-size: ${Math.random() * 20 + 12}px; --dur: ${Math.random() * 1.2 + 0.8}s;`;
+                s.innerHTML = ['✨', '⭐', '🌟', '💫', '⚜️', '👑'][Math.floor(Math.random() * 6)];
+                s.style.cssText = `left: ${x + (Math.random() - 0.5) * 120}px; top: ${y + (Math.random() - 0.5) * 120}px; font-size: ${Math.random() * 22 + 14}px; --dur: ${Math.random() * 1.2 + 0.8}s;`;
                 document.body.appendChild(s);
                 setTimeout(() => s.remove(), 2000);
             }
         }
-
-        // ============ AI CURSOR ============
+        
+        // ============ CURSOR ============
         const cursor = document.getElementById('royalCursor');
         document.addEventListener('mousemove', (e) => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
             cursor.classList.add('active');
-            if (Math.random() > 0.97) {
+            if (Math.random() > 0.96) {
                 createRoyalHeart(e.clientX, e.clientY);
-                createRoyalSparkle(e.clientX, e.clientY, 2);
+                createRoyalSparkle(e.clientX, e.clientY, 1);
             }
         });
         document.addEventListener('mouseleave', () => cursor.classList.remove('active'));
         
         // Ambient effects
         setInterval(() => {
-            if (Math.random() > 0.6) {
+            if (Math.random() > 0.55) {
                 createRoyalHeart(Math.random() * window.innerWidth, window.innerHeight - 30);
             }
-        }, 600);
-        
+        }, 500);
         setInterval(() => {
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.65) {
                 createRoyalFlower(Math.random() * window.innerWidth, window.innerHeight - 50);
             }
-        }, 800);
-
-        // ============ PAGE ENTRANCE EFFECT (ورقة بتتقلب) ============
-        function startPageEntranceEffect() {
-            const effect = document.getElementById('pageEffect');
-            effect.classList.add('active');
-            
-            // ورد وقلوب بينك لمدة 3 ثواني
-            for (let i = 0; i < 60; i++) {
-                setTimeout(() => {
-                    createRoyalFlower(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
-                    createRoyalHeart(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
-                }, i * 50);
+        }, 700);
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                createRoyalSparkle(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 2);
             }
-            
-            // كونفيتي ملكي
-            canvasConfetti({ particleCount: 500, spread: 180, origin: { y: 0.5 }, colors: ['#ffb7c5', '#ff8da3', '#e8c97a', '#c94f6b'], startVelocity: 25 });
-            setTimeout(() => {
-                canvasConfetti({ particleCount: 300, spread: 120, origin: { y: 0.4, x: 0.3 }, colors: ['#ffb7c5', '#e8c97a'] });
-                canvasConfetti({ particleCount: 300, spread: 120, origin: { y: 0.4, x: 0.7 }, colors: ['#ff8da3', '#c94f6b'] });
-            }, 500);
-            
-            setTimeout(() => {
-                effect.classList.remove('active');
-            }, 3000);
-        }
+        }, 1000);
         
-        // ============ GSAP SCROLL ANIMATIONS ============
-        gsap.registerPlugin(ScrollTrigger);
-        
-        document.querySelectorAll('.royal-card, .royal-countdown, .royal-form, .royal-comments').forEach(el => {
-            gsap.fromTo(el, 
-                { opacity: 0, y: 60, scale: 0.95 },
-                { opacity: 1, y: 0, scale: 1, duration: 0.8, scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' } }
-            );
-        });
-        
-        gsap.fromTo('.royal-count-item', 
-            { scale: 0, rotationY: -90 },
-            { scale: 1, rotationY: 0, duration: 0.6, stagger: 0.1, delay: 0.8, ease: 'back.out(1.2)' }
-        );
-
         // ============ COUNTDOWN ============
         function updateCountdown() {
             const diff = targetDate - Date.now();
@@ -982,16 +960,38 @@
             document.getElementById('minutes').textContent = String(Math.floor((diff % 3600000) / 60000)).padStart(2,'0');
             document.getElementById('seconds').textContent = String(Math.floor((diff % 60000) / 1000)).padStart(2,'0');
             
-            if (Math.random() > 0.75) {
+            if (Math.random() > 0.8) {
                 const boxes = ['daysBox', 'hoursBox', 'minutesBox', 'secondsBox'];
                 const box = document.getElementById(boxes[Math.floor(Math.random() * 4)]);
-                box.style.transform = 'scale(1.08)';
-                setTimeout(() => box.style.transform = '', 300);
+                gsap.to(box, { scale: 1.08, duration: 0.2, yoyo: true, repeat: 1, ease: 'power2.out' });
             }
         }
         setInterval(updateCountdown, 1000);
         updateCountdown();
-
+        
+        // ============ COUNTDOWN SETTINGS ============
+        function saveCountdownSettings() {
+            const dateTime = document.getElementById('adminCountdownDate').value;
+            if (dateTime) {
+                targetDate = new Date(dateTime).getTime();
+                db.ref('mainSettings/countdownDate').set(dateTime);
+                showModal('تم الحفظ', 'تم حفظ تاريخ الكاونتر بنجاح');
+                updateCountdown();
+            }
+        }
+        
+        // ============ RSVP MESSAGES ============
+        function getResponseMessage(name, status, side) {
+            const sideText = side === 'عريس' ? 'العريس' : 'العروسة';
+            if (status === 'حاضر') {
+                return `🎉 أهلاً وسهلاً يا ${name}!\n\nتشرفت خطوبتنا بحضورك الكريم من طرف ${sideText}\nنورت الفرحة بوجودك يا غالي\nنراك على خير إن شاء الله`;
+            } else if (status === 'ربما') {
+                return `🌸 إن شاء الله يا ${name}!\n\nبإذن الله تكون معانا وتشاركنا فرحتنا من طرف ${sideText}\nربنا يسهلك أمورك ونجتمع على خير\nمستنيينك بفارغ الصبر`;
+            } else {
+                return `💐 تسلم يا ${name}!\n\nقدرنا ظروفك وغيابك عن خطوبتنا هيكون له أثر\nمن طرف ${sideText}\nمحبتك في قلوبنا دايمًا\nوإن شاء الله في مناسبة قريبة نتقابل`;
+            }
+        }
+        
         // ============ ADMIN PANEL ============
         document.getElementById('secondsBox').addEventListener('click', () => {
             adminClicks++;
@@ -1000,7 +1000,7 @@
                 document.getElementById('adminPanel').classList.add('active');
                 loadSettingsToAdmin();
                 adminClicks = 0;
-                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 15);
+                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 20);
             }
         });
         
@@ -1021,13 +1021,14 @@
             document.getElementById('adminPanel').classList.remove('active');
         }
         
-        // ============ UPLOAD FUNCTIONS ============
+        // ============ UPLOAD ============
         function uploadGlobalBg() {
             cloudinary.openUploadWidget({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET, sources: ['local', 'url'] }, (err, res) => {
                 if (res && res.event === 'success') {
                     globalBg.src = res.info.secure_url;
                     document.getElementById('adminBgUrl').value = res.info.secure_url;
                     db.ref('mainSettings/globalBg').set(res.info.secure_url);
+                    createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 10);
                 }
             });
         }
@@ -1049,17 +1050,16 @@
             db.ref('mainSettings/globalBg').set(def);
         }
         
-        // ============ ADMIN FILTER & STATS ============
+        // ============ ADMIN FILTER ============
         function filterAdmin(filter, btn) {
             currentAdminFilter = filter;
-            document.querySelectorAll('#adminFilterBtns .royal-filter-admin').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#adminFilterBtns .admin-filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderAdminComments();
         }
         
         function renderAdminComments() {
             let filtered = [...allWishes];
-            
             if (currentAdminFilter === 'حاضر') filtered = allWishes.filter(w => w.status === 'حاضر');
             else if (currentAdminFilter === 'ربما') filtered = allWishes.filter(w => w.status === 'ربما');
             else if (currentAdminFilter === 'معتذر') filtered = allWishes.filter(w => w.status === 'معتذر');
@@ -1077,7 +1077,6 @@
                 list.innerHTML = '<div style="text-align:center;padding:30px;color:#888;">لا توجد بيانات</div>';
                 return;
             }
-            
             list.innerHTML = filtered.map(w => `
                 <div class="royal-comment" style="margin-bottom:10px;padding:12px;">
                     <span class="royal-comment-badge">${w.side === 'عريس' ? 'عريس' : 'عروسة'}</span>
@@ -1092,26 +1091,20 @@
         function deleteWish(id) {
             if (confirm('هل أنت متأكد من حذف هذه التهنئة؟')) {
                 db.ref('wishes/' + id).remove();
-                showModal('تم الحذف', 'تم حذف التهنئة بنجاح');
+                showModal('تم الحذف', 'تم حذف التهنئة بنجاح', '🗑️');
             }
         }
         
         function updateStats() {
-            let total = allWishes.length;
-            let present = allWishes.filter(w => w.status === 'حاضر').length;
-            let maybe = allWishes.filter(w => w.status === 'ربما').length;
-            let excused = allWishes.filter(w => w.status === 'معتذر').length;
-            let groom = allWishes.filter(w => w.side === 'عريس').length;
-            let bride = allWishes.filter(w => w.side === 'عروسة').length;
-            
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statPresent').textContent = present;
-            document.getElementById('statMaybe').textContent = maybe;
-            document.getElementById('statExcused').textContent = excused;
-            document.getElementById('statGroom').textContent = groom;
-            document.getElementById('statBride').textContent = bride;
+            document.getElementById('statTotal').textContent = allWishes.length;
+            document.getElementById('statPresent').textContent = allWishes.filter(w => w.status === 'حاضر').length;
+            document.getElementById('statMaybe').textContent = allWishes.filter(w => w.status === 'ربما').length;
+            document.getElementById('statExcused').textContent = allWishes.filter(w => w.status === 'معتذر').length;
+            document.getElementById('statGroom').textContent = allWishes.filter(w => w.side === 'عريس').length;
+            document.getElementById('statBride').textContent = allWishes.filter(w => w.side === 'عروسة').length;
         }
         
+        // ============ SAVE SETTINGS ============
         function saveAllSettings() {
             const settings = {
                 groom: document.getElementById('adminGroom').value,
@@ -1134,8 +1127,9 @@
             document.getElementById('locationLink').href = settings.locationLink;
             
             db.ref('mainSettings').set(settings);
-            showModal('تم الحفظ', 'تم حفظ جميع الإعدادات بنجاح');
-            createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 10);
+            showModal('تم الحفظ', 'تم حفظ جميع الإعدادات بنجاح', '💾');
+            createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 15);
+            canvasConfetti({ particleCount: 300, spread: 120, origin: { y: 0.6 }, colors: ['#e8c97a', '#ffb7c5'] });
         }
         
         // ============ LOAD FROM FIREBASE ============
@@ -1151,6 +1145,10 @@
                 if (data.locationLink) document.getElementById('locationLink').href = data.locationLink;
                 if (data.globalBg) globalBg.src = data.globalBg;
                 if (data.coupleImage) coupleImage.src = data.coupleImage;
+                if (data.countdownDate) {
+                    targetDate = new Date(data.countdownDate).getTime();
+                    updateCountdown();
+                }
             }
         });
         
@@ -1167,6 +1165,7 @@
             selectedSide = side;
             document.querySelectorAll('.royal-side-btn').forEach(btn => btn.classList.remove('active'));
             el.classList.add('active');
+            createRoyalSparkle(el.getBoundingClientRect().left + el.offsetWidth/2, el.getBoundingClientRect().top + el.offsetHeight/2, 3);
         }
         
         function submitRSVP() {
@@ -1175,7 +1174,7 @@
             const message = document.getElementById('guestMessage').value.trim();
             
             if (!name || !selectedSide) {
-                showModal('تنبيه', 'يرجى إدخال الاسم واختيار الطرف');
+                showModal('تنبيه', 'يرجى إدخال الاسم واختيار الطرف', '⚠️');
                 return;
             }
             
@@ -1183,14 +1182,19 @@
                 name, side: selectedSide, status, message,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
             }).then(() => {
-                showModal('تم الإرسال', `شكراً ${name} على تهنئتك`);
+                const responseMessage = getResponseMessage(name, status, selectedSide);
+                showModal('تم الإرسال', responseMessage, '💝');
                 document.getElementById('guestName').value = '';
                 document.getElementById('guestMessage').value = '';
                 document.querySelectorAll('.royal-side-btn').forEach(btn => btn.classList.remove('active'));
                 selectedSide = '';
-                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 20);
-                canvasConfetti({ particleCount: 400, spread: 130, origin: { y: 0.6 }, colors: ['#e8c97a', '#ffb7c5', '#c94f6b'] });
-            }).catch(() => showModal('خطأ', 'حدث خطأ، حاول مرة أخرى'));
+                createRoyalSparkle(window.innerWidth/2, window.innerHeight/2, 25);
+                canvasConfetti({ particleCount: 500, spread: 150, origin: { y: 0.6 }, colors: ['#e8c97a', '#ffb7c5', '#c94f6b', '#ff8da3'] });
+                setTimeout(() => {
+                    canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.4, x: 0.3 }, colors: ['#e8c97a', '#ffb7c5'] });
+                    canvasConfetti({ particleCount: 300, spread: 100, origin: { y: 0.4, x: 0.7 }, colors: ['#c94f6b', '#ff8da3'] });
+                }, 200);
+            }).catch(() => showModal('خطأ', 'حدث خطأ، حاول مرة أخرى', '❌'));
         }
         
         // ============ WISHES ============
@@ -1216,12 +1220,10 @@
         function renderWishes() {
             const list = document.getElementById('wishesList');
             let filtered = currentFilter === 'all' ? allWishes : allWishes.filter(w => w.side === currentFilter);
-            
             if (filtered.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:50px;color:#999;">لا توجد تهاني بعد</div>';
+                list.innerHTML = '<div style="text-align:center;padding:50px;color:#999;">✨ لا توجد تهاني بعد ✨</div>';
                 return;
             }
-            
             list.innerHTML = filtered.map(w => `
                 <div class="royal-comment">
                     <span class="royal-comment-badge">${w.side === 'عريس' ? 'العريس' : 'العروسة'}</span>
@@ -1249,13 +1251,28 @@
             document.getElementById('royalModal').classList.remove('active');
         }
         
+        // ============ GSAP SCROLL ============
+        gsap.registerPlugin(ScrollTrigger);
+        document.querySelectorAll('.royal-card, .royal-countdown, .royal-form, .royal-comments').forEach(el => {
+            gsap.fromTo(el, 
+                { opacity: 0, y: 70, scale: 0.95 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.9, scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' } }
+            );
+        });
+        
+        gsap.fromTo('.royal-count-item', 
+            { scale: 0, rotationY: -90, opacity: 0 },
+            { scale: 1, rotationY: 0, opacity: 1, duration: 0.7, stagger: 0.12, delay: 1.2, ease: 'back.out(1.2)' }
+        );
+        
         // ============ INIT ============
         setTimeout(() => {
-            startPageEntranceEffect();
+            startPageFlipEffect();
         }, 100);
         
-        console.log('%c👑 ROYAL INVITATION SYSTEM ACTIVATED 👑', 'color: #e8c97a; font-size: 20px; font-weight: bold;');
-        console.log('%c🎵 Music: Adkhly Omry | 🎨 AI Effects Active', 'color: #ffb7c5; font-size: 14px;');
+        console.log('%c👑 ROYAL INVITATION SYSTEM ACTIVATED 👑', 'color: #e8c97a; font-size: 22px; font-weight: bold;');
+        console.log('%c🎵 Music: Adkhly Omry (Auto-loop) | 🎨 AI Effects: Active', 'color: #ffb7c5; font-size: 14px;');
+        console.log('%c⚙️ Admin Panel: 10 clicks on SECONDS box', 'color: #ff8da3; font-size: 12px;');
     </script>
 </body>
 </html>
